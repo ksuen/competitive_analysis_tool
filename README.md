@@ -1,2 +1,2 @@
-# competitive_analysis_tool
+# Dental Pain Eraser Competitive Analysis Tool
  
