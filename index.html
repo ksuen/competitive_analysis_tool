@@ -27,13 +27,27 @@
     <input type="text" id="practiceName" placeholder="Practice Name" required>
     <input type="text" id="practiceAddress" placeholder="Practice Address" required>
     <input type="text" id="treatments" placeholder="Treatments (comma separated)">
+
+    <div id="keywordSuggestions" style="margin-bottom: 15px;">
+      <strong>Common Treatments:</strong><br>
+      <label><input type="checkbox" value="Braces"> Braces</label><br>
+      <label><input type="checkbox" value="Invisalign"> Invisalign</label><br>
+      <label><input type="checkbox" value="Orthodontist near me"> Orthodontist near me</label><br>
+      <label><input type="checkbox" value="Clear aligners"> Clear aligners</label><br>
+      <label><input type="checkbox" value="Adult braces"> Adult braces</label><br>
+      <label><input type="checkbox" value="Kids orthodontist"> Kids orthodontist</label><br>
+      <label><input type="checkbox" value="Emergency orthodontist"> Emergency orthodontist</label><br>
+      <label><input type="checkbox" value="Lingual braces"> Lingual braces</label><br>
+      <label><input type="checkbox" value="Affordable braces"> Affordable braces</label><br>
+      <label><input type="checkbox" value="Retainers"> Retainers</label><br>
+    </div>
+
     <button type="submit">Find Competitors</button>
   </form>
 
   <div id="errorMessage"></div>
 
   <div id="resultsContainer" style="display: none;">
-
     <div id="map"></div>
 
     <div id="legend">
@@ -55,7 +69,6 @@
     <div id="resultsList"></div>
 
     <button id="downloadPDF" style="margin-top: 20px;">Download Report as PDF</button>
-
   </div>
 
 </body>

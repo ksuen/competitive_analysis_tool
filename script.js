@@ -30,7 +30,11 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
   practiceAddressInput = document.getElementById("practiceAddress").value;
   treatmentsInput = document.getElementById("treatments").value;
 
-  selectedTreatments = treatmentsInput.split(",").map(t => t.trim().toLowerCase());
+  const typedTreatments = treatmentsInput.split(",").map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
+  const checkedBoxes = Array.from(document.querySelectorAll('#keywordSuggestions input[type="checkbox"]:checked'));
+  const checkedTreatments = checkedBoxes.map(cb => cb.value.toLowerCase());
+
+  selectedTreatments = typedTreatments.concat(checkedTreatments);
 
   const geocoder = new google.maps.Geocoder();
 
@@ -42,7 +46,7 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
       document.getElementById("resultsContainer").style.display = "block";
       document.getElementById("errorMessage").style.display = "none";
 
-      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?size=600x300&maptype=roadmap&key=AIzaSyAc8CsjTFsv9ajuALZ95JCWwS_rcpl0SOU&visible=${encodeURIComponent(practiceAddressInput)}`;
+      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&zoom=13&size=600x300&maptype=roadmap&key=AIzaSyAc8CsjTFsv9ajuALZ95JCWwS_rcpl0SOU&visible=${encodeURIComponent(practiceAddressInput)}`;
 
       const request = {
         location: location,
@@ -155,82 +159,7 @@ function renderResults() {
 
 document.getElementById("sortOptions").addEventListener("change", renderResults);
 
-document.getElementById("downloadPDF").addEventListener("click", function () {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  let yOffset = 10;
-
-  doc.setFontSize(14);
-  doc.text("Dental Pain Eraser - Competitor Analysis Report", 10, yOffset);
-
-  yOffset += 10;
-  doc.setFontSize(12);
-  doc.text(`Practice Name: ${practiceNameInput}`, 10, yOffset);
-  yOffset += 8;
-  doc.text(`Practice Address: ${practiceAddressInput}`, 10, yOffset);
-  yOffset += 8;
-  doc.text(`Treatments Offered: ${treatmentsInput}`, 10, yOffset);
-  yOffset += 12;
-
-  if (staticMapUrl) {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = staticMapUrl;
-    img.onload = function () {
-      doc.addImage(img, 'PNG', 10, yOffset, 190, 100);
-      continueWithCompetitors(doc, yOffset + 110);
-    };
-    img.onerror = function () {
-      doc.text("Static map could not be loaded.", 10, yOffset);
-      continueWithCompetitors(doc, yOffset + 10);
-    };
-  } else {
-    doc.text("Static map URL not set.", 10, yOffset);
-    continueWithCompetitors(doc, yOffset + 10);
-  }
-});
-
-function continueWithCompetitors(doc, yOffset) {
-  doc.setFontSize(12);
-
-  competitors.forEach((place, index) => {
-    let ranking = 'Poor';
-    if (place.rating >= 4.5) {
-      ranking = 'Excellent';
-    } else if (place.rating >= 4.0) {
-      ranking = 'Good';
-    } else if (place.rating >= 3.0) {
-      ranking = 'Fair';
-    }
-
-    let matchingTerms = [];
-    selectedTreatments.forEach(term => {
-      if (place.name && place.name.toLowerCase().includes(term)) {
-        matchingTerms.push(term);
-      }
-    });
-
-    const text = `${index + 1}. ${place.name}
-Address: ${place.vicinity}
-Rating: ${place.rating || 'N/A'}
-Competitive Ranking: ${ranking}
-Matching Treatments: ${matchingTerms.length > 0 ? matchingTerms.join(', ') : 'None'}
-
-`;
-
-    doc.text(text, 10, yOffset);
-    yOffset += 25;
-    if (yOffset > 270) {
-      doc.addPage();
-      yOffset = 20;
-    }
-  });
-
-  doc.save('Competitor_Analysis_Report.pdf');
-}
-
-// Global error catcher
+// Global error handler
 window.onerror = function(message, source, lineno, colno, error) {
   showError("Oops! Something went wrong. Please reload the page and try again.");
   console.error("Global Error:", message, "at", source + ":" + lineno + ":" + colno);
