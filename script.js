@@ -19,7 +19,7 @@ function showError(message) {
 function initMap(center) {
   map = new google.maps.Map(document.getElementById("map"), {
     center: center,
-    zoom: 11, // Updated zoom for browser map too
+    zoom: 12, // Updated zoom for browser map too
   });
 }
 
@@ -46,8 +46,8 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
       document.getElementById("resultsContainer").style.display = "block";
       document.getElementById("errorMessage").style.display = "none";
 
-      // Updated: static map with zoom=11
-      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&zoom=11&size=600x300&maptype=roadmap&key=AIzaSyAc8CsjTFsv9ajuALZ95JCWwS_rcpl0SOU`;
+      // Updated: static map with zoom=12
+      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&zoom=12&size=600x300&maptype=roadmap&key=AIzaSyAc8CsjTFsv9ajuALZ95JCWwS_rcpl0SOU`;
 
       const request = {
         location: location,
