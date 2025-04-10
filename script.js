@@ -26,6 +26,8 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
       const location = results[0].geometry.location;
       initMap(location);
 
+      document.getElementById("resultsContainer").style.display = "block";
+
       const request = {
         location: location,
         radius: '16093', // 10 miles in meters
