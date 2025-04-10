@@ -5,6 +5,7 @@ let service;
 let infowindow;
 let competitors = []; // Store competitors globally
 let staticMapUrl = ""; // URL for the static map image
+let selectedTreatments = []; // Treatments selected by user
 
 function initMap(center) {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -18,6 +19,10 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
 
   const practiceName = document.getElementById("practiceName").value;
   const practiceAddress = document.getElementById("practiceAddress").value;
+  const treatmentsInput = document.getElementById("treatments").value;
+
+  // Process treatments entered
+  selectedTreatments = treatmentsInput.split(",").map(t => t.trim().toLowerCase());
 
   const geocoder = new google.maps.Geocoder();
 
@@ -26,16 +31,15 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
       const location = results[0].geometry.location;
       initMap(location);
 
-      document.getElementById("resultsContainer").style.display = "block";
+      document.getElementById("resultsContainer").style.display = "block"; // Show hidden section
+
+      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddress)}&zoom=13&size=600x300&maptype=roadmap&key=YOUR_API_KEY_HERE`;
 
       const request = {
         location: location,
         radius: '16093', // 10 miles in meters
         keyword: 'orthodontist OR braces OR aligners',
       };
-
-      // Build Static Map URL
-      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddress)}&zoom=13&size=600x300&maptype=roadmap&key=YOUR_API_KEY_HERE`;
 
       service = new google.maps.places.PlacesService(map);
       service.nearbySearch(request, function (results, status) {
@@ -119,6 +123,14 @@ function renderResults() {
       ranking = 'Fair';
     }
 
+    // Find matching treatments
+    let matchingTerms = [];
+    selectedTreatments.forEach(term => {
+      if (place.name && place.name.toLowerCase().includes(term)) {
+        matchingTerms.push(term);
+      }
+    });
+
     const div = document.createElement("div");
     div.style.marginBottom = "10px";
     div.innerHTML = `
@@ -126,7 +138,8 @@ function renderResults() {
       <strong>${place.name}</strong><br>
       ${place.vicinity}<br>
       Rating: ${place.rating || 'N/A'}<br>
-      Competitive Ranking: ${ranking}
+      Competitive Ranking: ${ranking}<br>
+      <em>Matching Treatments: ${matchingTerms.length > 0 ? matchingTerms.join(', ') : 'None'}</em>
     `;
     resultsDiv.appendChild(div);
   });
@@ -176,11 +189,19 @@ function addCompetitorsToPDF(doc) {
       ranking = 'Fair';
     }
 
-    const text = `${index + 1}. ${place.name}\nAddress: ${place.vicinity}\nRating: ${place.rating || 'N/A'}\nCompetitive Ranking: ${ranking}\n\n`;
+    // Find matching treatments
+    let matchingTerms = [];
+    selectedTreatments.forEach(term => {
+      if (place.name && place.name.toLowerCase().includes(term)) {
+        matchingTerms.push(term);
+      }
+    });
+
+    const text = `${index + 1}. ${place.name}\nAddress: ${place.vicinity}\nRating: ${place.rating || 'N/A'}\nCompetitive Ranking: ${ranking}\nMatching Treatments: ${matchingTerms.length > 0 ? matchingTerms.join(', ') : 'None'}\n\n`;
 
     doc.text(text, 10, yOffset);
     yOffset += 25;
-    if (yOffset > 270) { // Start a new page if space runs out
+    if (yOffset > 270) { // New page if space runs out
       doc.addPage();
       yOffset = 20;
     }

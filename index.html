@@ -6,7 +6,7 @@
   
   <!-- Google Maps API -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAc8CsjTFsv9ajuALZ95JCWwS_rcpl0SOU&libraries=places"></script>
-
+  
   <!-- jsPDF for PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -18,7 +18,7 @@
     #map { height: 400px; width: 100%; margin-top: 20px; }
     form { display: flex; flex-direction: column; max-width: 400px; }
     input, button { margin-bottom: 10px; padding: 8px; }
-    #legend { margin-top: 10px; }
+    #legend, #resultsContainer { margin-top: 10px; }
     #resultsList { margin-top: 20px; }
     #sortOptions { margin: 10px 0; padding: 8px; }
   </style>
@@ -33,33 +33,37 @@
     <input type="text" id="treatments" placeholder="Treatments (comma separated)">
     <button type="submit">Find Competitors</button>
   </form>
-<!-- Start hidden content -->
-<div id="resultsContainer" style="display: none;">
-  <div id="map"></div>
 
-  <!-- Legend explaining colors -->
-  <div id="legend">
-    <strong>Legend:</strong><br>
-    <span style="color:green;">&#9679;</span> Excellent (4.5 - 5.0) |
-    <span style="color:blue;">&#9679;</span> Good (4.0 - 4.4) |
-    <span style="color:orange;">&#9679;</span> Fair (3.0 - 3.9) |
-    <span style="color:red;">&#9679;</span> Poor (&lt; 3.0 or N/A)
+  <!-- Hidden until form submission -->
+  <div id="resultsContainer" style="display: none;">
+
+    <div id="map"></div>
+
+    <!-- Legend explaining colors -->
+    <div id="legend">
+      <strong>Legend:</strong><br>
+      <span style="color:green;">&#9679;</span> Excellent (4.5 - 5.0) |
+      <span style="color:blue;">&#9679;</span> Good (4.0 - 4.4) |
+      <span style="color:orange;">&#9679;</span> Fair (3.0 - 3.9) |
+      <span style="color:red;">&#9679;</span> Poor (&lt; 3.0 or N/A)
+    </div>
+
+    <!-- Sorting options -->
+    <label for="sortOptions"><strong>Sort Competitors By:</strong></label>
+    <select id="sortOptions">
+      <option value="rating-desc">Rating: High to Low</option>
+      <option value="rating-asc">Rating: Low to High</option>
+      <option value="name-asc">Name: A to Z</option>
+    </select>
+
+    <!-- List of competitors -->
+    <h2>Competitors Found:</h2>
+    <div id="resultsList"></div>
+
+    <!-- Button to download PDF -->
+    <button id="downloadPDF" style="margin-top: 20px;">Download Report as PDF</button>
+
   </div>
 
-  <!-- Sorting options -->
-  <label for="sortOptions"><strong>Sort Competitors By:</strong></label>
-  <select id="sortOptions">
-    <option value="rating-desc">Rating: High to Low</option>
-    <option value="rating-asc">Rating: Low to High</option>
-    <option value="name-asc">Name: A to Z</option>
-  </select>
-
-  <!-- List of competitors -->
-  <h2>Competitors Found:</h2>
-  <div id="resultsList"></div>
-
-  <!-- Button to download PDF -->
-  <button id="downloadPDF" style="margin-top: 20px;">Download Report as PDF</button>
-</div>
 </body>
 </html>
