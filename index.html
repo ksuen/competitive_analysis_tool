@@ -3,8 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <title>Dental Pain Eraser - Competitor Analysis</title>
+  
+  <!-- Google Maps API -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAc8CsjTFsv9ajuALZ95JCWwS_rcpl0SOU&libraries=places"></script>
+
+  <!-- jsPDF for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Your main script -->
   <script defer src="script.js"></script>
+
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     #map { height: 400px; width: 100%; margin-top: 20px; }
@@ -16,7 +24,9 @@
   </style>
 </head>
 <body>
+
   <h1>Dental Pain Eraser - Competitor Finder</h1>
+
   <form id="dentistForm">
     <input type="text" id="practiceName" placeholder="Practice Name" required>
     <input type="text" id="practiceAddress" placeholder="Practice Address" required>
@@ -26,26 +36,29 @@
 
   <div id="map"></div>
 
-  <!-- Add a Legend -->
+  <!-- Legend explaining colors -->
   <div id="legend">
-    <strong>Rating:</strong><br>
+    <strong>Legend:</strong><br>
     <span style="color:green;">&#9679;</span> Excellent (4.5 - 5.0) |
     <span style="color:blue;">&#9679;</span> Good (4.0 - 4.4) |
     <span style="color:orange;">&#9679;</span> Fair (3.0 - 3.9) |
     <span style="color:red;">&#9679;</span> Poor (&lt; 3.0 or N/A)
   </div>
 
-  <!-- Sorting Dropdown -->
-  <label for="sortOptions"><strong>Sort By:</strong></label>
+  <!-- Sorting options -->
+  <label for="sortOptions"><strong>Sort Competitors By:</strong></label>
   <select id="sortOptions">
     <option value="rating-desc">Rating: High to Low</option>
     <option value="rating-asc">Rating: Low to High</option>
     <option value="name-asc">Name: A to Z</option>
   </select>
 
-  <!-- Results List -->
+  <!-- List of competitors -->
   <h2>Competitors Found:</h2>
   <div id="resultsList"></div>
+
+  <!-- Button to download PDF -->
+  <button id="downloadPDF" style="margin-top: 20px;">Download Report as PDF</button>
 
 </body>
 </html>

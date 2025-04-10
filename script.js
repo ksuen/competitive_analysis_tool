@@ -4,6 +4,7 @@ let map;
 let service;
 let infowindow;
 let competitors = []; // Store competitors globally
+let staticMapUrl = ""; // URL for the static map image
 
 function initMap(center) {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -30,6 +31,9 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
         radius: '16093', // 10 miles in meters
         keyword: 'orthodontist OR braces OR aligners',
       };
+
+      // Build Static Map URL
+      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddress)}&zoom=13&size=600x300&maptype=roadmap&key=YOUR_API_KEY_HERE`;
 
       service = new google.maps.places.PlacesService(map);
       service.nearbySearch(request, function (results, status) {
@@ -128,3 +132,57 @@ function renderResults() {
 
 // Listen for sort option change
 document.getElementById("sortOptions").addEventListener("change", renderResults);
+
+// PDF Download with Static Map
+document.getElementById("downloadPDF").addEventListener("click", function () {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  if (staticMapUrl) {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = staticMapUrl;
+    img.onload = function () {
+      doc.addImage(img, 'PNG', 10, 10, 190, 100); // x, y, width, height
+      addCompetitorsToPDF(doc);
+    };
+    img.onerror = function () {
+      console.error("Failed to load static map image.");
+      addCompetitorsToPDF(doc);
+    };
+  } else {
+    console.error("Static map URL not set.");
+    addCompetitorsToPDF(doc);
+  }
+});
+
+function addCompetitorsToPDF(doc) {
+  let yOffset = 120; // Start writing text below the map
+
+  doc.setFontSize(12);
+  doc.text("Dental Pain Eraser - Competitor Analysis Report", 10, yOffset);
+
+  yOffset += 10; // Space after title
+
+  competitors.forEach((place, index) => {
+    let ranking = 'Poor';
+    if (place.rating >= 4.5) {
+      ranking = 'Excellent';
+    } else if (place.rating >= 4.0) {
+      ranking = 'Good';
+    } else if (place.rating >= 3.0) {
+      ranking = 'Fair';
+    }
+
+    const text = `${index + 1}. ${place.name}\nAddress: ${place.vicinity}\nRating: ${place.rating || 'N/A'}\nCompetitive Ranking: ${ranking}\n\n`;
+
+    doc.text(text, 10, yOffset);
+    yOffset += 25;
+    if (yOffset > 270) { // Start a new page if space runs out
+      doc.addPage();
+      yOffset = 20;
+    }
+  });
+
+  doc.save('Competitor_Analysis_Report.pdf');
+}
