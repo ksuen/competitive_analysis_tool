@@ -33,7 +33,7 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
 
       document.getElementById("resultsContainer").style.display = "block"; // Show hidden section
 
-      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddress)}&zoom=13&size=600x300&maptype=roadmap&key=YOUR_API_KEY_HERE`;
+      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddress)}&zoom=13&size=600x300&maptype=roadmap&key=AIzaSyAc8CsjTFsv9ajuALZ95JCWwS_rcpl0SOU`;
 
       const request = {
         location: location,
