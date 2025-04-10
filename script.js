@@ -42,7 +42,7 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
       document.getElementById("resultsContainer").style.display = "block";
       document.getElementById("errorMessage").style.display = "none";
 
-      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&zoom=13&size=600x300&maptype=roadmap&key=AIzaSyAc8CsjTFsv9ajuALZ95JCWwS_rcpl0SOU`;
+      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?size=600x300&maptype=roadmap&key=AIzaSyAc8CsjTFsv9ajuALZ95JCWwS_rcpl0SOU&visible=${encodeURIComponent(practiceAddressInput)}`;
 
       const request = {
         location: location,
