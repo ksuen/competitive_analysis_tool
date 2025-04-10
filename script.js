@@ -19,7 +19,7 @@ function showError(message) {
 function initMap(center) {
   map = new google.maps.Map(document.getElementById("map"), {
     center: center,
-    zoom: 13,
+    zoom: 12, // Updated zoom for browser map too
   });
 }
 
@@ -46,6 +46,9 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
       document.getElementById("resultsContainer").style.display = "block";
       document.getElementById("errorMessage").style.display = "none";
 
+      // Updated: static map with zoom=12
+      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&zoom=12&size=600x300&maptype=roadmap&key=AIzaSyAc8CsjTFsv9ajuALZ95JCWwS_rcpl0SOU`;
+
       const request = {
         location: location,
         radius: '16093',
@@ -61,7 +64,6 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
             competitors.push(place);
             createMarker(place);
           });
-          buildStaticMapUrl();  // New: build the improved map URL after loading competitors
           renderResults();
         } else {
           document.getElementById("resultsList").innerHTML = "<h3 style='color:red;'>No competitors found.</h3>";
@@ -72,26 +74,6 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
     }
   });
 });
-
-function buildStaticMapUrl() {
-  let baseUrl = "https://maps.googleapis.com/maps/api/staticmap?size=600x300&maptype=roadmap";
-  let visible = [];
-  let markers = [];
-
-  // Add practice
-  visible.push(encodeURIComponent(practiceAddressInput));
-  markers.push(`color:red|label:P|${encodeURIComponent(practiceAddressInput)}`);
-
-  // Limit the number of competitors on the map to avoid URL length issues
-  competitors.slice(0, 20).forEach((place, index) => {
-    if (place.vicinity) {
-      visible.push(encodeURIComponent(place.vicinity));
-      markers.push(`color:blue|label:${index + 1}|${encodeURIComponent(place.vicinity)}`);
-    }
-  });
-
-  staticMapUrl = `${baseUrl}&visible=${visible.join('|')}&${markers.map(m => 'markers=' + m).join('&')}&key=AIzaSyAc8CsjTFsv9ajuALZ95JCWwS_rcpl0SOU`;
-}
 
 function createMarker(place) {
   let color = 'red';
