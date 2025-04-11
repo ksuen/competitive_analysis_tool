@@ -80,7 +80,6 @@ function buildStaticMapUrl() {
   let baseUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&size=600x300&maptype=roadmap&zoom=12`;
   let markers = [];
 
-  // Your practice location (always red)
   markers.push(`color:red|label:P|${encodeURIComponent(practiceAddressInput)}`);
 
   competitors.slice(0, 20).forEach((place, index) => {
@@ -88,14 +87,13 @@ function buildStaticMapUrl() {
       const lat = place.geometry.location.lat();
       const lng = place.geometry.location.lng();
 
-      // Determine color based on place rating
-      let color = 'red'; // Default poor
+      let color = 'red';
       if (place.rating >= 4.5) {
-        color = 'green'; // Excellent
+        color = 'green';
       } else if (place.rating >= 4.0) {
-        color = 'blue'; // Good
+        color = 'blue';
       } else if (place.rating >= 3.0) {
-        color = 'orange'; // Fair
+        color = 'orange';
       }
 
       markers.push(`color:${color}|label:${index + 1}|${lat},${lng}`);
@@ -106,11 +104,32 @@ function buildStaticMapUrl() {
 }
 
 function createMarker(place) {
+  let backgroundColor = 'red';
+  if (place.rating >= 4.5) {
+    backgroundColor = 'green';
+  } else if (place.rating >= 4.0) {
+    backgroundColor = 'blue';
+  } else if (place.rating >= 3.0) {
+    backgroundColor = 'orange';
+  }
+
   const marker = new google.maps.marker.AdvancedMarkerElement({
     map: map,
     position: place.geometry.location,
     title: place.name,
+    content: createCustomPin(backgroundColor)
   });
+}
+
+function createCustomPin(color) {
+  const pin = document.createElement('div');
+  pin.style.backgroundColor = color;
+  pin.style.width = '20px';
+  pin.style.height = '20px';
+  pin.style.borderRadius = '50%';
+  pin.style.border = '2px solid white';
+  pin.style.boxShadow = '0 0 3px rgba(0,0,0,0.5)';
+  return pin;
 }
 
 function renderResults() {
@@ -242,7 +261,7 @@ function continueWithCompetitors(doc, yOffset) {
     yOffset += 6;
     doc.text(`Matching Treatments: ${matchingTerms.length > 0 ? matchingTerms.join(', ') : 'None'}`, 10, yOffset);
 
-    yOffset += 10; // Add space between results
+    yOffset += 10;
 
     if (yOffset > 270) {
       doc.addPage();
