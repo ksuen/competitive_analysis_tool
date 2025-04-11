@@ -1,13 +1,11 @@
-// script.js
 let map;
-let service;
-let infowindow;
 let competitors = [];
 let staticMapUrl = "";
 let selectedTreatments = [];
 let practiceNameInput = "";
 let practiceAddressInput = "";
 let treatmentsInput = "";
+let placeLibrary;
 
 function showError(message) {
   const errorDiv = document.getElementById("errorMessage");
@@ -15,14 +13,16 @@ function showError(message) {
   errorDiv.innerText = message;
 }
 
-function initMap(center) {
+async function initMap() {
+  const center = { lat: 37.7749, lng: -122.4194 }; // Default SF center
   map = new google.maps.Map(document.getElementById("map"), {
     center: center,
     zoom: 12,
   });
+  placeLibrary = await google.maps.importLibrary("places");
 }
 
-document.getElementById("dentistForm").addEventListener("submit", function (e) {
+document.getElementById("dentistForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
   practiceNameInput = document.getElementById("practiceName").value;
@@ -37,73 +37,58 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
 
   const geocoder = new google.maps.Geocoder();
 
-  geocoder.geocode({ address: practiceAddressInput }, function (results, status) {
+  geocoder.geocode({ address: practiceAddressInput }, async function (results, status) {
     if (status === "OK") {
       const location = results[0].geometry.location;
-      initMap(location);
-
+      map.setCenter(location);
       document.getElementById("resultsContainer").style.display = "block";
       document.getElementById("errorMessage").style.display = "none";
-
-      const request = {
-        location: location,
-        radius: 16093,
-        keyword: "orthodontist OR braces OR aligners"
-      };
-
-      const placesService = new google.maps.places.PlacesService(document.getElementById("map"));
-      placesService.nearbySearch(request, (results, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          competitors = [];
-          document.getElementById("resultsList").innerHTML = "";
-          results.forEach(place => {
-            competitors.push(place);
-            createMarker(place);
-          });
-          buildStaticMapUrl();
-          renderResults();
-        } else {
-          document.getElementById("resultsList").innerHTML = "<h3 style='color:red;'>No competitors found.</h3>";
-        }
-      });
+      await findCompetitors(location);
     } else {
       showError("Unable to find that address. Please check and try again.");
     }
   });
 });
 
+async function findCompetitors(location) {
+  try {
+    const { Place } = placeLibrary;
+    const place = new Place({ locationBias: { center: location, radius: 16093 } });
+    const result = await place.searchNearby({ query: "orthodontist" });
+
+    competitors = result.places;
+    document.getElementById("resultsList").innerHTML = "";
+
+    competitors.forEach(place => {
+      createMarker(place);
+    });
+
+    buildStaticMapUrl();
+    renderResults();
+  } catch (error) {
+    showError("Could not find nearby competitors: " + error.message);
+  }
+}
+
 function buildStaticMapUrl() {
   let baseUrl = "https://maps.googleapis.com/maps/api/staticmap?size=600x300&maptype=roadmap&zoom=12";
   let markers = [];
-
   markers.push(`color:red|label:P|${encodeURIComponent(practiceAddressInput)}`);
-
   competitors.slice(0, 20).forEach((place, index) => {
-    if (place.geometry && place.geometry.location) {
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
+    if (place.location) {
+      const lat = place.location.lat;
+      const lng = place.location.lng;
       markers.push(`color:blue|label:${index + 1}|${lat},${lng}`);
     }
   });
-
   staticMapUrl = `${baseUrl}&${markers.map(m => 'markers=' + m).join('&')}&key=YOUR_API_KEY_HERE`;
 }
 
 function createMarker(place) {
-  const marker = new google.maps.marker.AdvancedMarkerElement({
+  new google.maps.marker.AdvancedMarkerElement({
     map: map,
-    position: place.geometry.location,
-    title: place.name,
-  });
-
-  marker.addListener("click", () => {
-    if (!infowindow) {
-      infowindow = new google.maps.InfoWindow();
-    }
-    infowindow.setContent(
-      `<strong>${place.name}</strong><br>${place.vicinity}<br>Rating: ${place.rating || 'N/A'}`
-    );
-    infowindow.open(map, marker);
+    position: place.location,
+    title: place.displayName || "Unknown",
   });
 }
 
@@ -116,7 +101,7 @@ function renderResults() {
   } else if (sortOption === "rating-asc") {
     sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
   } else if (sortOption === "name-asc") {
-    sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    sorted.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
   }
 
   const resultsDiv = document.getElementById("resultsList");
@@ -136,30 +121,14 @@ function renderResults() {
       ranking = 'Fair';
     }
 
-    let matchingTerms = [];
-    selectedTreatments.forEach(term => {
-      if (place.name && place.name.toLowerCase().includes(term)) {
-        matchingTerms.push(term);
-      }
-    });
-
     const div = document.createElement("div");
     div.style.marginBottom = "10px";
     div.innerHTML = `
       <span style="display:inline-block; width:12px; height:12px; background-color:${color}; border-radius:50%; margin-right:8px;"></span>
-      <strong>${place.name}</strong><br>
-      ${place.vicinity}<br>
+      <strong>${place.displayName}</strong><br>
       Rating: ${place.rating || 'N/A'}<br>
       Competitive Ranking: ${ranking}<br>
-      <em>Matching Treatments: ${matchingTerms.length > 0 ? matchingTerms.join(', ') : 'None'}</em>
     `;
     resultsDiv.appendChild(div);
   });
 }
-
-document.getElementById("sortOptions").addEventListener("change", renderResults);
-
-window.onerror = function(message, source, lineno, colno, error) {
-  showError("Oops! Something went wrong. Please reload the page and try again.");
-  console.error("Global Error:", message, "at", source + ":" + lineno + ":" + colno);
-};
