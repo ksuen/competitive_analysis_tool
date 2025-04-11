@@ -1,4 +1,4 @@
-// script.js (Refactored)
+// script.js (Refactored with improved spacing and alphabetical sorting)
 let map;
 let service;
 let competitors = [];
@@ -80,9 +80,15 @@ function renderResults() {
   const sortOption = document.getElementById("sortOptions").value;
   let sorted = [...competitors];
 
-  if (sortOption === "rating-desc") sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-  else if (sortOption === "rating-asc") sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
-  else if (sortOption === "name-asc") sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  if (sortOption === "rating-desc") {
+    sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  } else if (sortOption === "rating-asc") {
+    sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+  } else if (sortOption === "name-asc") {
+    sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  } else if (sortOption === "name-desc") {
+    sorted.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+  }
 
   const resultsDiv = document.getElementById("resultsList");
   resultsDiv.innerHTML = "";
@@ -176,13 +182,14 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.setFont(undefined, 'bold');
   doc.text("Practice Address:", 10, yOffset);
   doc.setFont(undefined, 'normal');
-  doc.text(` ${practiceAddressInput}`, 50, yOffset);
+  yOffset += 8;
+  doc.text(` ${practiceAddressInput}`, 10, yOffset);
   yOffset += 8;
 
   doc.setFont(undefined, 'bold');
   doc.text("Treatments Offered:", 10, yOffset);
   doc.setFont(undefined, 'normal');
-  yOffset += 6;
+  yOffset += 8;
 
   const allTreatments = selectedTreatments.length ? selectedTreatments.join(', ') : 'N/A';
   doc.text(allTreatments, 10, yOffset);
