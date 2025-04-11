@@ -8,6 +8,8 @@ let selectedTreatments = [];
 let practiceNameInput = "";
 let practiceAddressInput = "";
 let treatmentsInput = "";
+let typedTreatments = [];
+let checkedTreatments = [];
 
 const MAP_ID = 'YOUR_MAP_ID_HERE'; // Replace with your real Map ID
 
@@ -32,9 +34,8 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
   practiceAddressInput = document.getElementById("practiceAddress").value;
   treatmentsInput = document.getElementById("treatments").value;
 
-  const typedTreatments = treatmentsInput.split(",").map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
-  const checkedBoxes = Array.from(document.querySelectorAll('#keywordSuggestions input[type="checkbox"]:checked'));
-  const checkedTreatments = checkedBoxes.map(cb => cb.value.toLowerCase());
+  typedTreatments = treatmentsInput.split(",").map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
+  checkedTreatments = Array.from(document.querySelectorAll('#keywordSuggestions input[type="checkbox"]:checked')).map(cb => cb.value.toLowerCase());
 
   selectedTreatments = typedTreatments.concat(checkedTreatments);
 
@@ -76,7 +77,7 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
 });
 
 function buildStaticMapUrl() {
-  let baseUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&size=600x300&maptype=roadmap&zoom=11`;
+  let baseUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&size=600x300&maptype=roadmap&zoom=12`;
   let markers = [];
 
   markers.push(`color:red|label:P|${encodeURIComponent(practiceAddressInput)}`);
@@ -169,8 +170,28 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   yOffset += 8;
   doc.text(`Practice Address: ${practiceAddressInput}`, 10, yOffset);
   yOffset += 8;
-  doc.text(`Treatments Offered: ${selectedTreatments.join(', ') || 'None'}`, 10, yOffset);
-  yOffset += 12;
+
+  doc.setFont(undefined, 'bold');
+  doc.text("Treatments Offered:", 10, yOffset);
+  doc.setFont(undefined, 'normal');
+  yOffset += 6;
+
+  if (typedTreatments.length > 0) {
+    doc.text(`- From Input: ${typedTreatments.join(', ')}`, 10, yOffset);
+    yOffset += 6;
+  }
+
+  if (checkedTreatments.length > 0) {
+    doc.text(`- From Checkboxes: ${checkedTreatments.join(', ')}`, 10, yOffset);
+    yOffset += 6;
+  }
+
+  if (typedTreatments.length === 0 && checkedTreatments.length === 0) {
+    doc.text("- None", 10, yOffset);
+    yOffset += 6;
+  }
+
+  yOffset += 6;
 
   if (staticMapUrl) {
     const img = new Image();
