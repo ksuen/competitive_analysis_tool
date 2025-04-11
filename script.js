@@ -176,22 +176,9 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.setFont(undefined, 'normal');
   yOffset += 6;
 
-  if (typedTreatments.length > 0) {
-    doc.text(`- From Input: ${typedTreatments.join(', ')}`, 10, yOffset);
-    yOffset += 6;
-  }
-
-  if (checkedTreatments.length > 0) {
-    doc.text(`- From Checkboxes: ${checkedTreatments.join(', ')}`, 10, yOffset);
-    yOffset += 6;
-  }
-
-  if (typedTreatments.length === 0 && checkedTreatments.length === 0) {
-    doc.text("- None", 10, yOffset);
-    yOffset += 6;
-  }
-
-  yOffset += 6;
+  const allTreatments = selectedTreatments.length > 0 ? selectedTreatments.join(', ') : 'N/A';
+  doc.text(allTreatments, 10, yOffset);
+  yOffset += 10;
 
   if (staticMapUrl) {
     const img = new Image();

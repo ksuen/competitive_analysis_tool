@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <title>Dental Pain Eraser - Competitor Analysis</title>
 
-  <!-- Load Google Maps JavaScript API with Places and Marker libraries -->
+  <!-- Load Google Maps JavaScript API -->
   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&libraries=places,marker&loading=async" async defer></script>
 
   <!-- Load jsPDF library for PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <!-- Load your custom JavaScript after libraries are ready -->
+  <!-- Your custom JavaScript -->
   <script defer src="script.js"></script>
 
   <style>
@@ -31,21 +31,16 @@
   <form id="dentistForm">
     <input type="text" id="practiceName" placeholder="Practice Name" required>
     <input type="text" id="practiceAddress" placeholder="Practice Address" required>
-    <input type="text" id="treatments" placeholder="Treatments (comma separated)">
 
     <div id="keywordSuggestions" style="margin-bottom: 15px;">
       <strong>Common Treatments:</strong><br>
       <label><input type="checkbox" value="Braces"> Braces</label><br>
       <label><input type="checkbox" value="Invisalign"> Invisalign</label><br>
-      <label><input type="checkbox" value="Orthodontist near me"> Orthodontist near me</label><br>
-      <label><input type="checkbox" value="Clear aligners"> Clear aligners</label><br>
-      <label><input type="checkbox" value="Adult braces"> Adult braces</label><br>
-      <label><input type="checkbox" value="Kids orthodontist"> Kids orthodontist</label><br>
-      <label><input type="checkbox" value="Emergency orthodontist"> Emergency orthodontist</label><br>
-      <label><input type="checkbox" value="Lingual braces"> Lingual braces</label><br>
-      <label><input type="checkbox" value="Affordable braces"> Affordable braces</label><br>
-      <label><input type="checkbox" value="Retainers"> Retainers</label><br>
+      <label><input type="checkbox" value="Clear aligners"> Clear Aligners</label><br>
+      <label><input type="checkbox" value="Retainers"> Retainers</label><br><br><br>
     </div>
+
+    <input type="text" id="treatments" placeholder="Other Treatments (optional)">
 
     <button type="submit">Find Competitors</button>
   </form>
