@@ -2,63 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dental Pain Eraser - Competitor Analysis</title>
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&libraries=places&loading=async&callback=Function.prototype"></script>
+
+  <!-- Load Google Maps JavaScript API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&libraries=places,marker&loading=async" async defer></script>
+
+  <!-- Load jsPDF library for PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css">
+
+  <!-- Your custom JavaScript -->
+  <script defer src="script.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #map { height: 400px; width: 100%; margin-top: 20px; }
+    form { display: flex; flex-direction: column; max-width: 400px; }
+    input, button { margin-bottom: 10px; padding: 8px; }
+    #ratings, #resultsContainer { margin-top: 10px; }
+    #resultsList { margin-top: 20px; }
+    #sortOptions { margin: 10px 0; padding: 8px; }
+    #errorMessage { color: red; margin-top: 10px; display: none; }
+  </style>
 </head>
 <body>
 
-  <h1>Dental Pain Eraser - Competitor Analysis Tool</h1>
+  <h1>Dental Pain Eraser - Competitor Finder</h1>
 
   <form id="dentistForm">
-    <label for="practiceName">Practice Name:</label><br>
-    <input type="text" id="practiceName" name="practiceName" required><br><br>
-
-    <label for="practiceAddress">Practice Address:</label><br>
-    <input type="text" id="practiceAddress" name="practiceAddress" required><br><br>
+    <input type="text" id="practiceName" placeholder="Practice Name" required>
+    <input type="text" id="practiceAddress" placeholder="Practice Address" required>
 
     <div id="keywordSuggestions" style="margin-bottom: 10px;">
       <strong>Common Treatments:</strong><br>
       <label><input type="checkbox" value="Braces"> Braces</label><br>
       <label><input type="checkbox" value="Invisalign"> Invisalign</label><br>
       <label><input type="checkbox" value="Clear aligners"> Clear Aligners</label><br>
-      <label><input type="checkbox" value="Retainers"> Retainers</label><br><br>
+      <label><input type="checkbox" value="Retainers"> Retainers</label><br>
     </div>
 
-    <label for="treatments">Other Treatments Offered (comma separated):</label><br>
-    <input type="text" id="treatments" name="treatments"><br><br>
+    <input type="text" id="treatments" placeholder="Other Treatments (optional)">
 
-    <button type="submit">Analyze Competition</button>
+    <button type="submit">Find Competitors</button>
   </form>
 
-  <div id="errorMessage" style="display:none; color: red; margin-top: 10px;"></div>
+  <div id="errorMessage"></div>
 
-  <div id="resultsContainer" style="display:none; margin-top: 20px;">
-    <h2>Analysis Results</h2>
-    <div style="margin-bottom: 10px;">
-      <label for="sortOptions">Sort Results:</label>
-      <select id="sortOptions">
-        <option value="rating-desc">Rating (High to Low)</option>
-        <option value="rating-asc">Rating (Low to High)</option>
-        <option value="name-asc">Name (A → Z)</option>
-        <option value="name-desc">Name (Z → A)</option>
-      </select>
-    </div>
-    <div id="map" style="height: 400px; width: 100%; margin-bottom: 20px;"></div>
+  <div id="resultsContainer" style="display: none;">
+    <div id="map"></div>
+
     <div id="ratings">
       <strong>Ratings:</strong><br>
-      <div><span style="background-color: green; width:12px; height:12px; display:inline-block; border-radius:50%; margin-right:5px;"></span> Excellent</div>
-      <div><span style="background-color: blue; width:12px; height:12px; display:inline-block; border-radius:50%; margin-right:5px;"></span> Good</div>
-      <div><span style="background-color: orange; width:12px; height:12px; display:inline-block; border-radius:50%; margin-right:5px;"></span> Fair</div>
-      <div><span style="background-color: red; width:12px; height:12px; display:inline-block; border-radius:50%; margin-right:5px;"></span> Poor</div>
+      <span style="color:green;">&#9679;</span> Excellent (4.5 - 5.0) |
+      <span style="color:blue;">&#9679;</span> Good (4.0 - 4.4) |
+      <span style="color:orange;">&#9679;</span> Fair (3.0 - 3.9) |
+      <span style="color:red;">&#9679;</span> Poor (&lt; 3.0 or N/A)
     </div>
-    <div id="resultsList" style="margin-top: 20px;"></div>
-    <button id="downloadPDF" style="margin-top: 20px;">Download PDF Report</button>
-  </div>
 
-  <script src="script.js"></script>
+    <label for="sortOptions"><strong>Sort Competitors By:</strong></label>
+    <select id="sortOptions">
+      <option value="rating-desc">Rating: High to Low</option>
+      <option value="rating-asc">Rating: Low to High</option>
+      <option value="name-asc">Name: A to Z</option>
+      <option value="name-desc">Name (Z to A)</option>
+    </select>
+
+    <h2>Competitors Found:</h2>
+    <div id="resultsList"></div>
+
+    <button id="downloadPDF" style="margin-top: 20px;">Download Report as PDF</button>
+  </div>
 
 </body>
 </html>
