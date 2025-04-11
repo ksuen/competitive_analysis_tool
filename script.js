@@ -163,7 +163,9 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
 
   yOffset += 10;
   doc.setFontSize(12);
+  doc.setFont(undefined, 'bold');
   doc.text(`Practice Name: ${practiceNameInput}`, 10, yOffset);
+  doc.setFont(undefined, 'normal');
   yOffset += 8;
   doc.text(`Practice Address: ${practiceAddressInput}`, 10, yOffset);
   yOffset += 8;
@@ -208,10 +210,20 @@ function continueWithCompetitors(doc, yOffset) {
       }
     });
 
-    const text = `${index + 1}. ${place.name}\nAddress: ${place.vicinity}\nRating: ${place.rating || 'N/A'}\nCompetitive Ranking: ${ranking}\nMatching Treatments: ${matchingTerms.length > 0 ? matchingTerms.join(', ') : 'None'}\n\n`;
+    doc.setFont(undefined, 'bold');
+    doc.text(`${index + 1}. ${place.name}`, 10, yOffset);
+    doc.setFont(undefined, 'normal');
+    yOffset += 6;
+    doc.text(`Address: ${place.vicinity}`, 10, yOffset);
+    yOffset += 6;
+    doc.text(`Rating: ${place.rating || 'N/A'}`, 10, yOffset);
+    yOffset += 6;
+    doc.text(`Competitive Ranking: ${ranking}`, 10, yOffset);
+    yOffset += 6;
+    doc.text(`Matching Treatments: ${matchingTerms.length > 0 ? matchingTerms.join(', ') : 'None'}`, 10, yOffset);
 
-    doc.text(text, 10, yOffset);
-    yOffset += 25;
+    yOffset += 10; // Add space between results
+
     if (yOffset > 270) {
       doc.addPage();
       yOffset = 20;
