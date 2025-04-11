@@ -80,13 +80,25 @@ function buildStaticMapUrl() {
   let baseUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&size=600x300&maptype=roadmap&zoom=12`;
   let markers = [];
 
+  // Your practice location (always red)
   markers.push(`color:red|label:P|${encodeURIComponent(practiceAddressInput)}`);
 
   competitors.slice(0, 20).forEach((place, index) => {
     if (place.geometry && place.geometry.location) {
       const lat = place.geometry.location.lat();
       const lng = place.geometry.location.lng();
-      markers.push(`color:blue|label:${index + 1}|${lat},${lng}`);
+
+      // Determine color based on place rating
+      let color = 'red'; // Default poor
+      if (place.rating >= 4.5) {
+        color = 'green'; // Excellent
+      } else if (place.rating >= 4.0) {
+        color = 'blue'; // Good
+      } else if (place.rating >= 3.0) {
+        color = 'orange'; // Fair
+      }
+
+      markers.push(`color:${color}|label:${index + 1}|${lat},${lng}`);
     }
   });
 
