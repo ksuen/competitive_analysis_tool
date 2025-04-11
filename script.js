@@ -47,7 +47,7 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
       document.getElementById("errorMessage").style.display = "none";
 
       // Updated: static map with zoom=14
-      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&zoom=14&size=600x300&maptype=roadmap&key=__GOOGLE_MAPS_API_KEY__`;
+      staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&zoom=14&size=600x300&maptype=roadmap&key=YOUR_API_KEY_HERE`;
 
       const request = {
         location: location,
