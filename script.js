@@ -1,4 +1,4 @@
-// script.js (Refactored with improved spacing and alphabetical sorting)
+// script.js (Lightly Refactored and Polished)
 let map;
 let service;
 let competitors = [];
@@ -15,6 +15,10 @@ function showError(message) {
   const errorDiv = document.getElementById("errorMessage");
   errorDiv.style.display = "block";
   errorDiv.innerText = message;
+}
+
+function normalizeString(str) {
+  return (str || '').toLowerCase().trim();
 }
 
 function initMap(center) {
@@ -65,7 +69,7 @@ function buildStaticMapUrl() {
   const markers = [`color:red|label:P|${encodeURIComponent(practiceAddressInput)}`];
 
   competitors.slice(0, 20).forEach((place, index) => {
-    if (place.geometry && place.geometry.location) {
+    if (place.geometry?.location) {
       const lat = place.geometry.location.lat();
       const lng = place.geometry.location.lng();
       const color = getColorByRating(place.rating);
@@ -78,6 +82,7 @@ function buildStaticMapUrl() {
 
 function renderResults() {
   const sortOption = document.getElementById("sortOptions").value;
+  const resultsDiv = document.getElementById("resultsList");
   let sorted = [...competitors];
 
   if (sortOption === "rating-desc") {
@@ -85,12 +90,11 @@ function renderResults() {
   } else if (sortOption === "rating-asc") {
     sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
   } else if (sortOption === "name-asc") {
-    sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    sorted.sort((a, b) => normalizeString(a.name).localeCompare(normalizeString(b.name)));
   } else if (sortOption === "name-desc") {
-    sorted.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+    sorted.sort((a, b) => normalizeString(b.name).localeCompare(normalizeString(a.name)));
   }
 
-  const resultsDiv = document.getElementById("resultsList");
   resultsDiv.innerHTML = "";
 
   sorted.forEach(place => {
@@ -115,17 +119,20 @@ function renderResults() {
 document.getElementById("dentistForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
-  practiceNameInput = document.getElementById("practiceName").value;
-  practiceAddressInput = document.getElementById("practiceAddress").value;
-  const treatmentsInput = document.getElementById("treatments").value;
+  const formPracticeName = document.getElementById("practiceName");
+  const formPracticeAddress = document.getElementById("practiceAddress");
+  const formTreatments = document.getElementById("treatments");
 
-  typedTreatments = treatmentsInput.split(",").map(t => t.trim().toLowerCase()).filter(Boolean);
+  practiceNameInput = formPracticeName.value;
+  practiceAddressInput = formPracticeAddress.value;
+
+  typedTreatments = formTreatments.value.split(",").map(t => t.trim().toLowerCase()).filter(Boolean);
   checkedTreatments = Array.from(document.querySelectorAll('#keywordSuggestions input[type="checkbox"]:checked')).map(cb => cb.value.toLowerCase());
   selectedTreatments = [...typedTreatments, ...checkedTreatments];
 
   const geocoder = new google.maps.Geocoder();
   geocoder.geocode({ address: practiceAddressInput }, function (results, status) {
-    if (status === "OK") {
+    if (status === "OK" && results?.length > 0) {
       const location = results[0].geometry.location;
       initMap(location);
 
@@ -138,7 +145,7 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
         radius: '16093',
         keyword: 'orthodontist OR braces OR aligners',
       }, function (results, status) {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
+        if (status === google.maps.places.PlacesServiceStatus.OK && results?.length > 0) {
           competitors = results;
           document.getElementById("resultsList").innerHTML = "";
           competitors.forEach(createMarker);
@@ -158,6 +165,8 @@ document.getElementById("sortOptions").addEventListener("change", renderResults)
 
 document.getElementById("downloadPDF").addEventListener("click", function () {
   const { jsPDF } = window.jspdf;
+  const today = new Date();
+  const dateString = today.toLocaleDateString();
   const doc = new jsPDF();
   let yOffset = 10;
 
@@ -165,8 +174,6 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.text("Dental Pain Eraser - Competitor Analysis Report", 10, yOffset);
   yOffset += 10;
 
-  const today = new Date();
-  const dateString = today.toLocaleDateString();
   doc.setFont(undefined, 'bold');
   doc.text("Date:", 10, yOffset);
   doc.setFont(undefined, 'normal');
@@ -200,8 +207,14 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
     img.crossOrigin = "anonymous";
     img.src = staticMapUrl;
     img.onload = () => {
-      doc.addImage(img, 'PNG', 10, yOffset, 190, 100);
-      addCompetitorsToPDF(doc, yOffset + 110);
+      try {
+        doc.addImage(img, 'PNG', 10, yOffset, 190, 100);
+        addCompetitorsToPDF(doc, yOffset + 110);
+      } catch (error) {
+        console.error("Error adding map image to PDF:", error);
+        doc.text("Static map could not be loaded.", 10, yOffset);
+        addCompetitorsToPDF(doc, yOffset + 10);
+      }
     };
     img.onerror = () => {
       doc.text("Static map could not be loaded.", 10, yOffset);
