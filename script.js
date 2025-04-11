@@ -1,3 +1,4 @@
+// script.js
 let map;
 let competitors = [];
 let staticMapUrl = "";
@@ -14,7 +15,7 @@ function showError(message) {
 }
 
 async function initMap() {
-  const center = { lat: 37.7749, lng: -122.4194 }; // Default SF center
+  const center = { lat: 37.7749, lng: -122.4194 }; // Default center (San Francisco)
   map = new google.maps.Map(document.getElementById("map"), {
     center: center,
     zoom: 12,
@@ -52,9 +53,13 @@ document.getElementById("dentistForm").addEventListener("submit", async function
 
 async function findCompetitors(location) {
   try {
-    const { Place } = placeLibrary;
-    const place = new Place({ locationBias: { center: location, radius: 16093 } });
-    const result = await place.searchNearby({ query: "orthodontist" });
+    const { PlaceSearch } = placeLibrary;
+    const placeSearch = new PlaceSearch();
+    const result = await placeSearch.searchNearby({
+      locationBias: { center: location, radius: 16093 },
+      query: "orthodontist",
+      fields: ["displayName", "location", "rating"]
+    });
 
     competitors = result.places;
     document.getElementById("resultsList").innerHTML = "";
@@ -73,7 +78,9 @@ async function findCompetitors(location) {
 function buildStaticMapUrl() {
   let baseUrl = "https://maps.googleapis.com/maps/api/staticmap?size=600x300&maptype=roadmap&zoom=12";
   let markers = [];
+
   markers.push(`color:red|label:P|${encodeURIComponent(practiceAddressInput)}`);
+
   competitors.slice(0, 20).forEach((place, index) => {
     if (place.location) {
       const lat = place.location.lat;
@@ -81,6 +88,7 @@ function buildStaticMapUrl() {
       markers.push(`color:blue|label:${index + 1}|${lat},${lng}`);
     }
   });
+
   staticMapUrl = `${baseUrl}&${markers.map(m => 'markers=' + m).join('&')}&key=YOUR_API_KEY_HERE`;
 }
 
@@ -132,3 +140,10 @@ function renderResults() {
     resultsDiv.appendChild(div);
   });
 }
+
+document.getElementById("sortOptions").addEventListener("change", renderResults);
+
+window.onerror = function(message, source, lineno, colno, error) {
+  showError("Oops! Something went wrong. Please reload the page and try again.");
+  console.error("Global Error:", message, "at", source + ":" + lineno + ":" + colno);
+};
