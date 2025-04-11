@@ -11,7 +11,7 @@ let treatmentsInput = "";
 let typedTreatments = [];
 let checkedTreatments = [];
 
-const MAP_ID = 'YOUR_MAP_ID_HERE'; // Replace with your real Map ID
+const MAP_ID = 'YOUR_MAP_ID_HERE';
 
 function showError(message) {
   const errorDiv = document.getElementById("errorMessage");
@@ -197,16 +197,22 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
 
   const today = new Date();
   const dateString = today.toLocaleDateString();
-  doc.setFontSize(10);
-  doc.text(`Date: ${dateString}`, 10, yOffset);
-  yOffset += 6;
-
-  doc.setFontSize(12);
   doc.setFont(undefined, 'bold');
-  doc.text(`Practice Name: ${practiceNameInput}`, 10, yOffset);
+  doc.text("Date:", 10, yOffset);
   doc.setFont(undefined, 'normal');
+  doc.text(` ${dateString}`, 30, yOffset);
   yOffset += 8;
-  doc.text(`Practice Address: ${practiceAddressInput}`, 10, yOffset);
+
+  doc.setFont(undefined, 'bold');
+  doc.text("Practice Name:", 10, yOffset);
+  doc.setFont(undefined, 'normal');
+  doc.text(` ${practiceNameInput}`, 50, yOffset);
+  yOffset += 8;
+
+  doc.setFont(undefined, 'bold');
+  doc.text("Practice Address:", 10, yOffset);
+  doc.setFont(undefined, 'normal');
+  doc.text(` ${practiceAddressInput}`, 50, yOffset);
   yOffset += 8;
 
   doc.setFont(undefined, 'bold');
