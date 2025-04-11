@@ -46,14 +46,14 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
       document.getElementById("errorMessage").style.display = "none";
 
       const request = {
-        locationBias: { center: location, radius: 16093 },
-        includedTypes: ["dentist"],
-        query: "orthodontist OR braces OR aligners"
+        location: location,
+        radius: 16093,
+        keyword: "orthodontist OR braces OR aligners"
       };
 
-      const placesService = new google.maps.places.Place();
-      placesService.searchNearby(request, (results, status) => {
-        if (status === "OK") {
+      const placesService = new google.maps.places.PlacesService(map);
+      placesService.nearbySearch(request, (results, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
           competitors = [];
           document.getElementById("resultsList").innerHTML = "";
           results.forEach(place => {
@@ -90,15 +90,6 @@ function buildStaticMapUrl() {
 }
 
 function createMarker(place) {
-  let color = 'red';
-  if (place.rating >= 4.5) {
-    color = 'green';
-  } else if (place.rating >= 4.0) {
-    color = 'blue';
-  } else if (place.rating >= 3.0) {
-    color = 'orange';
-  }
-
   const marker = new google.maps.marker.AdvancedMarkerElement({
     map: map,
     position: place.geometry.location,
