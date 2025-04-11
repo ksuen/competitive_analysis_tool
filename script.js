@@ -6,7 +6,6 @@ let selectedTreatments = [];
 let practiceNameInput = "";
 let practiceAddressInput = "";
 let treatmentsInput = "";
-let placeLibrary;
 
 function showError(message) {
   const errorDiv = document.getElementById("errorMessage");
@@ -14,16 +13,15 @@ function showError(message) {
   errorDiv.innerText = message;
 }
 
-async function initMap() {
+function initMap() {
   const center = { lat: 37.7749, lng: -122.4194 }; // Default center (San Francisco)
   map = new google.maps.Map(document.getElementById("map"), {
     center: center,
     zoom: 12,
   });
-  placeLibrary = await google.maps.importLibrary("places");
 }
 
-document.getElementById("dentistForm").addEventListener("submit", async function (e) {
+document.getElementById("dentistForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
   practiceNameInput = document.getElementById("practiceName").value;
@@ -38,41 +36,39 @@ document.getElementById("dentistForm").addEventListener("submit", async function
 
   const geocoder = new google.maps.Geocoder();
 
-  geocoder.geocode({ address: practiceAddressInput }, async function (results, status) {
+  geocoder.geocode({ address: practiceAddressInput }, function (results, status) {
     if (status === "OK") {
       const location = results[0].geometry.location;
       map.setCenter(location);
       document.getElementById("resultsContainer").style.display = "block";
       document.getElementById("errorMessage").style.display = "none";
-      await findCompetitors(location);
+      findCompetitors(location);
     } else {
       showError("Unable to find that address. Please check and try again.");
     }
   });
 });
 
-async function findCompetitors(location) {
-  try {
-    const { PlaceSearch } = placeLibrary;
-    const placeSearch = new PlaceSearch();
-    const result = await placeSearch.searchNearby({
-      locationBias: { center: location, radius: 16093 },
-      query: "orthodontist",
-      fields: ["displayName", "location", "rating"]
-    });
+function findCompetitors(location) {
+  const service = new google.maps.places.PlacesService(document.getElementById("map"));
 
-    competitors = result.places;
-    document.getElementById("resultsList").innerHTML = "";
-
-    competitors.forEach(place => {
-      createMarker(place);
-    });
-
-    buildStaticMapUrl();
-    renderResults();
-  } catch (error) {
-    showError("Could not find nearby competitors: " + error.message);
-  }
+  service.nearbySearch({
+    location: location,
+    radius: 16093,
+    keyword: "orthodontist"
+  }, (results, status) => {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+      competitors = results;
+      document.getElementById("resultsList").innerHTML = "";
+      competitors.forEach(place => {
+        createMarker(place);
+      });
+      buildStaticMapUrl();
+      renderResults();
+    } else {
+      showError("No competitors found.");
+    }
+  });
 }
 
 function buildStaticMapUrl() {
@@ -82,9 +78,9 @@ function buildStaticMapUrl() {
   markers.push(`color:red|label:P|${encodeURIComponent(practiceAddressInput)}`);
 
   competitors.slice(0, 20).forEach((place, index) => {
-    if (place.location) {
-      const lat = place.location.lat;
-      const lng = place.location.lng;
+    if (place.geometry && place.geometry.location) {
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
       markers.push(`color:blue|label:${index + 1}|${lat},${lng}`);
     }
   });
@@ -95,8 +91,8 @@ function buildStaticMapUrl() {
 function createMarker(place) {
   new google.maps.marker.AdvancedMarkerElement({
     map: map,
-    position: place.location,
-    title: place.displayName || "Unknown",
+    position: place.geometry.location,
+    title: place.name || "Unknown",
   });
 }
 
@@ -109,7 +105,7 @@ function renderResults() {
   } else if (sortOption === "rating-asc") {
     sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
   } else if (sortOption === "name-asc") {
-    sorted.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
+    sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
   }
 
   const resultsDiv = document.getElementById("resultsList");
@@ -133,7 +129,7 @@ function renderResults() {
     div.style.marginBottom = "10px";
     div.innerHTML = `
       <span style="display:inline-block; width:12px; height:12px; background-color:${color}; border-radius:50%; margin-right:8px;"></span>
-      <strong>${place.displayName}</strong><br>
+      <strong>${place.name}</strong><br>
       Rating: ${place.rating || 'N/A'}<br>
       Competitive Ranking: ${ranking}<br>
     `;
