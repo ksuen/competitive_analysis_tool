@@ -194,6 +194,13 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.text("Dental Pain Eraser - Competitor Analysis Report", 10, yOffset);
 
   yOffset += 10;
+
+  const today = new Date();
+  const dateString = today.toLocaleDateString();
+  doc.setFontSize(10);
+  doc.text(`Date: ${dateString}`, 10, yOffset);
+  yOffset += 6;
+
   doc.setFontSize(12);
   doc.setFont(undefined, 'bold');
   doc.text(`Practice Name: ${practiceNameInput}`, 10, yOffset);
