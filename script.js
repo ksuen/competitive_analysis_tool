@@ -9,6 +9,8 @@ let practiceNameInput = "";
 let practiceAddressInput = "";
 let treatmentsInput = "";
 
+const MAP_ID = 'YOUR_MAP_ID_HERE'; // Replace with your real Map ID
+
 function showError(message) {
   const errorDiv = document.getElementById("errorMessage");
   errorDiv.style.display = "block";
@@ -19,6 +21,7 @@ function initMap(center) {
   map = new google.maps.Map(document.getElementById("map"), {
     center: center,
     zoom: 12,
+    mapId: MAP_ID,
   });
 }
 

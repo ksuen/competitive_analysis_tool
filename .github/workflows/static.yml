@@ -35,6 +35,8 @@ jobs:
         run: |
           sed -i "s|YOUR_API_KEY_HERE|${{ secrets.MAPS_API_KEY }}|g" index.html
           sed -i "s|YOUR_API_KEY_HERE|${{ secrets.MAPS_API_KEY }}|g" script.js
+          sed -i "s|YOUR_MAP_ID_HERE|${{ secrets.GOOGLE_MAP_ID }}|g" index.html
+          sed -i "s|YOUR_MAP_ID_HERE|${{ secrets.GOOGLE_MAP_ID }}|g" script.js
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
