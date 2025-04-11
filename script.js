@@ -51,7 +51,7 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
         keyword: "orthodontist OR braces OR aligners"
       };
 
-      const placesService = new google.maps.places.PlacesService(map);
+      const placesService = new google.maps.places.PlacesService(document.getElementById("map"));
       placesService.nearbySearch(request, (results, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
           competitors = [];
