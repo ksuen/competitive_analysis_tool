@@ -76,7 +76,7 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
 });
 
 function buildStaticMapUrl() {
-  let baseUrl = "https://maps.googleapis.com/maps/api/staticmap?size=600x300&maptype=roadmap&zoom=12";
+  let baseUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&size=600x300&maptype=roadmap&zoom=12`;
   let markers = [];
 
   markers.push(`color:red|label:P|${encodeURIComponent(practiceAddressInput)}`);
