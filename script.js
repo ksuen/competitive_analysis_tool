@@ -1,4 +1,4 @@
-// script.js - Updated to include Place Details API and smarter treatment matching
+// script.js (Lightly Refactored and Polished)
 let map;
 let service;
 let competitors = [];
@@ -100,16 +100,7 @@ function renderResults() {
   sorted.forEach(place => {
     const color = getColorByRating(place.rating);
     const ranking = getRankingByRating(place.rating);
-
-    const lowerCaseTerms = selectedTreatments.map(term => term.toLowerCase());
-    const allText = `
-      ${place.name || ''} 
-      ${place.website || ''} 
-      ${place.editorial_summary?.overview || ''} 
-      ${place.reviews?.map(r => r.text).join(' ') || ''}
-    `.toLowerCase();
-
-    const matchingTerms = lowerCaseTerms.filter(term => allText.includes(term));
+    const matchingTerms = selectedTreatments.filter(term => place.name?.toLowerCase().includes(term));
 
     const div = document.createElement("div");
     div.style.marginBottom = "10px";
@@ -122,29 +113,6 @@ function renderResults() {
       <em>Matching Treatments: ${matchingTerms.length ? matchingTerms.join(', ') : 'None'}</em>
     `;
     resultsDiv.appendChild(div);
-  });
-}
-
-function fetchPlaceDetailsBatch(places, onComplete) {
-  let remaining = places.length;
-  const detailedResults = [];
-
-  places.forEach(place => {
-    service.getDetails({
-      placeId: place.place_id,
-      fields: ["name", "formatted_address", "website", "types", "reviews", "editorial_summary"]
-    }, (details, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        detailedResults.push({ ...place, ...details });
-      } else {
-        detailedResults.push(place);
-      }
-
-      remaining--;
-      if (remaining === 0) {
-        onComplete(detailedResults);
-      }
-    });
   });
 }
 
@@ -175,16 +143,14 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
       service.nearbySearch({
         location,
         radius: '16093',
-        keyword: selectedTreatments.join(" OR ") || 'orthodontist OR braces OR aligners',
+        keyword: 'orthodontist OR braces OR aligners',
       }, function (results, status) {
         if (status === google.maps.places.PlacesServiceStatus.OK && results?.length > 0) {
-          fetchPlaceDetailsBatch(results.slice(0, 15), (detailedResults) => {
-            competitors = detailedResults;
-            document.getElementById("resultsList").innerHTML = "";
-            competitors.forEach(createMarker);
-            buildStaticMapUrl();
-            renderResults();
-          });
+          competitors = results;
+          document.getElementById("resultsList").innerHTML = "";
+          competitors.forEach(createMarker);
+          buildStaticMapUrl();
+          renderResults();
         } else {
           document.getElementById("resultsList").innerHTML = "<h3 style='color:red;'>No competitors found.</h3>";
         }
