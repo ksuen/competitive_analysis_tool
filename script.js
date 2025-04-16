@@ -1,4 +1,5 @@
-// script.js (Lightly Refactored and Polished)
+
+// Cleaned and Refactored script.js for Dental Pain Eraser
 let map;
 let service;
 let competitors = [];
@@ -85,31 +86,13 @@ function fetchPlaceDetailsBatch(places, onComplete) {
   const detailedResults = [];
 
   places.forEach(place => {
-    service.getDetails(
-      {
-        placeId: place.place_id,
-        fields: [
-          "name",
-          "formatted_address",
-          "website",
-          "types",
-          "reviews",
-          "editorial_summary"
-        ],
-      },
-      (details, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          detailedResults.push({ ...place, ...details });
-        } else {
-          detailedResults.push(place); // fallback to original if details fail
-        }
-
-        remaining--;
-        if (remaining === 0) {
-          onComplete(detailedResults);
-        }
-      }
-    );
+    service.getDetails({
+      placeId: place.place_id,
+      fields: ["name", "formatted_address", "website", "types", "reviews", "editorial_summary"]
+    }, (details, status) => {
+      detailedResults.push(status === google.maps.places.PlacesServiceStatus.OK ? { ...place, ...details } : place);
+      if (--remaining === 0) onComplete(detailedResults);
+    });
   });
 }
 
@@ -118,22 +101,19 @@ function renderResults() {
   const resultsDiv = document.getElementById("resultsList");
   let sorted = [...competitors];
 
-  if (sortOption === "rating-desc") {
-    sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-  } else if (sortOption === "rating-asc") {
-    sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
-  } else if (sortOption === "name-asc") {
-    sorted.sort((a, b) => normalizeString(a.name).localeCompare(normalizeString(b.name)));
-  } else if (sortOption === "name-desc") {
-    sorted.sort((a, b) => normalizeString(b.name).localeCompare(normalizeString(a.name)));
-  }
+  sorted.sort((a, b) => {
+    if (sortOption === "rating-desc") return (b.rating || 0) - (a.rating || 0);
+    if (sortOption === "rating-asc") return (a.rating || 0) - (b.rating || 0);
+    if (sortOption === "name-asc") return normalizeString(a.name).localeCompare(normalizeString(b.name));
+    if (sortOption === "name-desc") return normalizeString(b.name).localeCompare(normalizeString(a.name));
+    return 0;
+  });
 
   resultsDiv.innerHTML = "";
 
   sorted.forEach(place => {
     const color = getColorByRating(place.rating);
     const ranking = getRankingByRating(place.rating);
-    const lowerCaseTerms = selectedTreatments.map(term => term.toLowerCase());
     const allText = `
       ${place.name || ''} 
       ${place.website || ''} 
@@ -141,7 +121,7 @@ function renderResults() {
       ${place.reviews?.map(r => r.text).join(' ') || ''}
     `.toLowerCase();
 
-	const matchingTerms = lowerCaseTerms.filter(term => allText.includes(term));
+    const matchingTerms = selectedTreatments.filter(term => allText.includes(term.toLowerCase()));
 
     const div = document.createElement("div");
     div.style.marginBottom = "10px";
@@ -160,12 +140,9 @@ function renderResults() {
 document.getElementById("dentistForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
-  const formPracticeName = document.getElementById("practiceName");
-  const formPracticeAddress = document.getElementById("practiceAddress");
+  practiceNameInput = document.getElementById("practiceName").value;
+  practiceAddressInput = document.getElementById("practiceAddress").value;
   const formTreatments = document.getElementById("treatments");
-
-  practiceNameInput = formPracticeName.value;
-  practiceAddressInput = formPracticeAddress.value;
 
   typedTreatments = formTreatments.value.split(",").map(t => t.trim().toLowerCase()).filter(Boolean);
   checkedTreatments = Array.from(document.querySelectorAll('#keywordSuggestions input[type="checkbox"]:checked')).map(cb => cb.value.toLowerCase());
@@ -187,13 +164,13 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
         keyword: 'orthodontist OR braces OR aligners',
       }, function (results, status) {
         if (status === google.maps.places.PlacesServiceStatus.OK && results?.length > 0) {
-            fetchPlaceDetailsBatch(results.slice(0, 15), (detailedResults) => {
-               competitors = detailedResults;
-               document.getElementById("resultsList").innerHTML = "";
-               competitors.forEach(createMarker);
-               buildStaticMapUrl();
-               renderResults();
-            });
+          fetchPlaceDetailsBatch(results.slice(0, 15), (detailedResults) => {
+            competitors = detailedResults;
+            document.getElementById("resultsList").innerHTML = "";
+            competitors.forEach(createMarker);
+            buildStaticMapUrl();
+            renderResults();
+          });
         } else {
           document.getElementById("resultsList").innerHTML = "<h3 style='color:red;'>No competitors found.</h3>";
         }
@@ -205,6 +182,9 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
 });
 
 document.getElementById("sortOptions").addEventListener("change", renderResults);
+
+// Additional logic like PDF export and error handler should be added as needed
+
 
 document.getElementById("downloadPDF").addEventListener("click", function () {
   const { jsPDF } = window.jspdf;
@@ -275,15 +255,13 @@ function addCompetitorsToPDF(doc, yOffset) {
   const sortOption = document.getElementById("sortOptions").value;
   let sorted = [...competitors];
 
-  if (sortOption === "rating-desc") {
-    sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-  } else if (sortOption === "rating-asc") {
-    sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
-  } else if (sortOption === "name-asc") {
-    sorted.sort((a, b) => normalizeString(a.name).localeCompare(normalizeString(b.name)));
-  } else if (sortOption === "name-desc") {
-    sorted.sort((a, b) => normalizeString(b.name).localeCompare(normalizeString(a.name)));
-  }
+  sorted.sort((a, b) => {
+    if (sortOption === "rating-desc") return (b.rating || 0) - (a.rating || 0);
+    if (sortOption === "rating-asc") return (a.rating || 0) - (b.rating || 0);
+    if (sortOption === "name-asc") return normalizeString(a.name).localeCompare(normalizeString(b.name));
+    if (sortOption === "name-desc") return normalizeString(b.name).localeCompare(normalizeString(a.name));
+    return 0;
+  });
 
   sorted.forEach((place, index) => {
     const ranking = getRankingByRating(place.rating);
@@ -294,7 +272,7 @@ function addCompetitorsToPDF(doc, yOffset) {
       ${place.reviews?.map(r => r.text).join(' ') || ''}
     `.toLowerCase();
 
-    const matchingTerms = selectedTreatments.filter(term => allText.includes(term));
+    const matchingTerms = selectedTreatments.filter(term => allText.includes(term.toLowerCase()));
 
     doc.setFont(undefined, 'bold');
     doc.text(`${index + 1}. ${place.name}`, 10, yOffset);
