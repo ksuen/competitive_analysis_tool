@@ -116,11 +116,12 @@ function fetchPlaceDetailsBatch(places, onComplete) {
 function renderResults() {
   const sortOption = document.getElementById("sortOptions").value;
   const resultsDiv = document.getElementById("resultsList");
-  let sorted = [...competitors
-  if (sortOption === "ratingesc") {
-    sorted.sort((a, b) => .rating || 0    ) - (a.rating || 0));
-  } else if (sortOption = "rat            asc") {
-    sorted.sort((a, b) => (a.rating    || 0) - (b.rating || 0));
+  let sorted = [...competitors];
+
+  if (sortOption === "rating-desc") {
+    sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  } else if (sortOption === "rating-asc") {
+    sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
   } else if (sortOption === "name-asc") {
     sorted.sort((a, b) => normalizeString(a.name).localeCompare(normalizeString(b.name)));
   } else if (sortOption === "name-desc") {
