@@ -272,9 +272,29 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
 function addCompetitorsToPDF(doc, yOffset) {
   doc.setFontSize(12);
 
-  competitors.forEach((place, index) => {
+  const sortOption = document.getElementById("sortOptions").value;
+  let sorted = [...competitors];
+
+  if (sortOption === "rating-desc") {
+    sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  } else if (sortOption === "rating-asc") {
+    sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+  } else if (sortOption === "name-asc") {
+    sorted.sort((a, b) => normalizeString(a.name).localeCompare(normalizeString(b.name)));
+  } else if (sortOption === "name-desc") {
+    sorted.sort((a, b) => normalizeString(b.name).localeCompare(normalizeString(a.name)));
+  }
+
+  sorted.forEach((place, index) => {
     const ranking = getRankingByRating(place.rating);
-    const matchingTerms = selectedTreatments.filter(term => place.name?.toLowerCase().includes(term));
+    const allText = `
+      ${place.name || ''} 
+      ${place.website || ''} 
+      ${place.editorial_summary?.overview || ''} 
+      ${place.reviews?.map(r => r.text).join(' ') || ''}
+    `.toLowerCase();
+
+    const matchingTerms = selectedTreatments.filter(term => allText.includes(term));
 
     doc.setFont(undefined, 'bold');
     doc.text(`${index + 1}. ${place.name}`, 10, yOffset);
