@@ -80,16 +80,11 @@ function buildStaticMapUrl() {
   staticMapUrl = `${baseUrl}&${markers.map(m => 'markers=' + m).join('&')}&key=YOUR_API_KEY_HERE`;
 }
 
-// ... (unchanged up to fetchPlaceDetailsBatch)
-
 function fetchPlaceDetailsBatch(places, onComplete) {
-  console.log("[DEBUG] Fetching place details for", places.length, "places.");
   let remaining = places.length;
   const detailedResults = [];
 
-  places.forEach((place, i) => {
-    console.log(`[DEBUG] Requesting details for place #${i + 1}:`, place.name);
-
+  places.forEach(place => {
     service.getDetails(
       {
         placeId: place.place_id,
@@ -104,16 +99,13 @@ function fetchPlaceDetailsBatch(places, onComplete) {
       },
       (details, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
-          console.log(`[DEBUG] Got details for: ${details.name}`);
           detailedResults.push({ ...place, ...details });
         } else {
-          console.warn(`[WARN] Failed to get details for: ${place.name}`, status);
-          detailedResults.push(place);
+          detailedResults.push(place); // fallback to original if details fail
         }
 
         remaining--;
         if (remaining === 0) {
-          console.log("[DEBUG] All place detail fetches complete.");
           onComplete(detailedResults);
         }
       }
@@ -121,25 +113,27 @@ function fetchPlaceDetailsBatch(places, onComplete) {
   });
 }
 
-// ... renderResults() modified to include debug
 function renderResults() {
-  console.log("[DEBUG] Rendering results. Treatments:", selectedTreatments);
   const sortOption = document.getElementById("sortOptions").value;
   const resultsDiv = document.getElementById("resultsList");
   let sorted = [...competitors];
 
-  if (sortOption === "rating-desc") sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-  if (sortOption === "rating-asc") sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
-  if (sortOption === "name-asc") sorted.sort((a, b) => normalizeString(a.name).localeCompare(normalizeString(b.name)));
-  if (sortOption === "name-desc") sorted.sort((a, b) => normalizeString(b.name).localeCompare(normalizeString(a.name)));
+  if (sortOption === "rating-desc") {
+    sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  } else if (sortOption === "rating-asc") {
+    sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+  } else if (sortOption === "name-asc") {
+    sorted.sort((a, b) => normalizeString(a.name).localeCompare(normalizeString(b.name)));
+  } else if (sortOption === "name-desc") {
+    sorted.sort((a, b) => normalizeString(b.name).localeCompare(normalizeString(a.name)));
+  }
 
   resultsDiv.innerHTML = "";
 
-  sorted.forEach((place, index) => {
+  sorted.forEach(place => {
     const color = getColorByRating(place.rating);
     const ranking = getRankingByRating(place.rating);
     const lowerCaseTerms = selectedTreatments.map(term => term.toLowerCase());
-
     const allText = `
       ${place.name || ''} 
       ${place.website || ''} 
@@ -147,11 +141,7 @@ function renderResults() {
       ${place.reviews?.map(r => r.text).join(' ') || ''}
     `.toLowerCase();
 
-    const matchingTerms = lowerCaseTerms.filter(term => allText.includes(term));
-
-    console.log(`[DEBUG] Competitor ${index + 1}: ${place.name}`);
-    console.log(`        Matching Treatments:`, matchingTerms);
-    console.log(`        Searched Text Snippet:`, allText.substring(0, 100), "...");
+	const matchingTerms = lowerCaseTerms.filter(term => allText.includes(term));
 
     const div = document.createElement("div");
     div.style.marginBottom = "10px";
@@ -167,9 +157,9 @@ function renderResults() {
   });
 }
 
-// Add console logging to the submit handler
 document.getElementById("dentistForm").addEventListener("submit", function (e) {
   e.preventDefault();
+
   const formPracticeName = document.getElementById("practiceName");
   const formPracticeAddress = document.getElementById("practiceAddress");
   const formTreatments = document.getElementById("treatments");
@@ -181,16 +171,10 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
   checkedTreatments = Array.from(document.querySelectorAll('#keywordSuggestions input[type="checkbox"]:checked')).map(cb => cb.value.toLowerCase());
   selectedTreatments = [...typedTreatments, ...checkedTreatments];
 
-  console.log("[DEBUG] Form submitted:");
-  console.log("  Practice Name:", practiceNameInput);
-  console.log("  Address:", practiceAddressInput);
-  console.log("  Selected Treatments:", selectedTreatments);
-
   const geocoder = new google.maps.Geocoder();
   geocoder.geocode({ address: practiceAddressInput }, function (results, status) {
     if (status === "OK" && results?.length > 0) {
       const location = results[0].geometry.location;
-      console.log("[DEBUG] Geocoded Address:", location.toString());
       initMap(location);
 
       document.getElementById("resultsContainer").style.display = "block";
@@ -203,26 +187,22 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
         keyword: 'orthodontist OR braces OR aligners',
       }, function (results, status) {
         if (status === google.maps.places.PlacesServiceStatus.OK && results?.length > 0) {
-          console.log("[DEBUG] Nearby Search Results:", results);
-          fetchPlaceDetailsBatch(results.slice(0, 15), (detailedResults) => {
-            competitors = detailedResults;
-            document.getElementById("resultsList").innerHTML = "";
-            competitors.forEach(createMarker);
-            buildStaticMapUrl();
-            renderResults();
-          });
+            fetchPlaceDetailsBatch(results.slice(0, 15), (detailedResults) => {
+               competitors = detailedResults;
+               document.getElementById("resultsList").innerHTML = "";
+               competitors.forEach(createMarker);
+               buildStaticMapUrl();
+               renderResults();
+            });
         } else {
-          console.warn("[WARN] Nearby search returned no results or failed.", status);
           document.getElementById("resultsList").innerHTML = "<h3 style='color:red;'>No competitors found.</h3>";
         }
       });
     } else {
       showError("Unable to find that address. Please check and try again.");
-      console.error("[ERROR] Geocode failed:", status);
     }
   });
 });
-
 
 document.getElementById("sortOptions").addEventListener("change", renderResults);
 
