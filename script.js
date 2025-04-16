@@ -153,6 +153,15 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
     if (status === "OK" && results?.length > 0) {
       const location = results[0].geometry.location;
       initMap(location);
+	  	  
+      new google.maps.Marker({
+        position: location,
+        map: map,
+        title: "Your Practice",
+        icon: {
+          url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+        }
+      });
 
       document.getElementById("resultsContainer").style.display = "block";
       document.getElementById("errorMessage").style.display = "none";
@@ -182,9 +191,6 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
 });
 
 document.getElementById("sortOptions").addEventListener("change", renderResults);
-
-// Additional logic like PDF export and error handler should be added as needed
-
 
 document.getElementById("downloadPDF").addEventListener("click", function () {
   const { jsPDF } = window.jspdf;
