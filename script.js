@@ -133,7 +133,6 @@ function renderResults() {
   sorted.forEach(place => {
     const color = getColorByRating(place.rating);
     const ranking = getRankingByRating(place.rating);
-    const matchingTerms = selectedTreatments.filter(term => place.name?.toLowerCase().includes(term));
 	const lowerCaseTerms = selectedTreatments.map(term => term.toLowerCase());
 	const allText = `
 	  ${place.name || ''} 
