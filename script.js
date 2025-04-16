@@ -1,4 +1,5 @@
-// script.js (Lightly Refactored and Polished)
+
+// script.js (Enhanced with Debug + Improved Matching)
 let map;
 let service;
 let competitors = [];
@@ -65,22 +66,20 @@ function createMarker(place) {
 }
 
 function buildStaticMapUrl() {
-  const baseUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(practiceAddressInput)}&size=600x300&maptype=roadmap&zoom=12`;
-  const markers = [`color:red|label:P|${encodeURIComponent(practiceAddressInput)}`];
+  const baseUrl = \`https://maps.googleapis.com/maps/api/staticmap?center=\${encodeURIComponent(practiceAddressInput)}&size=600x300&maptype=roadmap&zoom=12\`;
+  const markers = [\`color:red|label:P|\${encodeURIComponent(practiceAddressInput)}\`];
 
   competitors.slice(0, 20).forEach((place, index) => {
     if (place.geometry?.location) {
       const lat = place.geometry.location.lat();
       const lng = place.geometry.location.lng();
       const color = getColorByRating(place.rating);
-      markers.push(`color:${color}|label:${index + 1}|${lat},${lng}`);
+      markers.push(\`color:\${color}|label:\${index + 1}|\${lat},\${lng}\`);
     }
   });
 
-  staticMapUrl = `${baseUrl}&${markers.map(m => 'markers=' + m).join('&')}&key=YOUR_API_KEY_HERE`;
+  staticMapUrl = \`\${baseUrl}&\${markers.map(m => 'markers=' + m).join('&')}&key=YOUR_API_KEY_HERE\`;
 }
-
-// ... (unchanged up to fetchPlaceDetailsBatch)
 
 function fetchPlaceDetailsBatch(places, onComplete) {
   console.log("[DEBUG] Fetching place details for", places.length, "places.");
@@ -88,7 +87,7 @@ function fetchPlaceDetailsBatch(places, onComplete) {
   const detailedResults = [];
 
   places.forEach((place, i) => {
-    console.log(`[DEBUG] Requesting details for place #${i + 1}:`, place.name);
+    console.log(\`[DEBUG] Requesting details for place #\${i + 1}:\`, place.name);
 
     service.getDetails(
       {
@@ -104,10 +103,10 @@ function fetchPlaceDetailsBatch(places, onComplete) {
       },
       (details, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
-          console.log(`[DEBUG] Got details for: ${details.name}`);
+          console.log(\`[DEBUG] Got details for: \${details.name}\`);
           detailedResults.push({ ...place, ...details });
         } else {
-          console.warn(`[WARN] Failed to get details for: ${place.name}`, status);
+          console.warn(\`[WARN] Failed to get details for: \${place.name}\`, status);
           detailedResults.push(place);
         }
 
@@ -121,7 +120,6 @@ function fetchPlaceDetailsBatch(places, onComplete) {
   });
 }
 
-// ... renderResults() modified to include debug
 function renderResults() {
   console.log("[DEBUG] Rendering results. Treatments:", selectedTreatments);
   const sortOption = document.getElementById("sortOptions").value;
@@ -140,34 +138,33 @@ function renderResults() {
     const ranking = getRankingByRating(place.rating);
     const lowerCaseTerms = selectedTreatments.map(term => term.toLowerCase());
 
-    const allText = `
-      ${place.name || ''} 
-      ${place.website || ''} 
-      ${place.editorial_summary?.overview || ''} 
-      ${place.reviews?.map(r => r.text).join(' ') || ''}
-    `.toLowerCase();
+    const allText = \`
+      \${place.name || ''} 
+      \${place.website || ''} 
+      \${place.editorial_summary?.overview || ''} 
+      \${place.reviews?.map(r => r.text).join(' ') || ''}
+    \`.toLowerCase();
 
     const matchingTerms = lowerCaseTerms.filter(term => allText.includes(term));
 
-    console.log(`[DEBUG] Competitor ${index + 1}: ${place.name}`);
-    console.log(`        Matching Treatments:`, matchingTerms);
-    console.log(`        Searched Text Snippet:`, allText.substring(0, 100), "...");
+    console.log(\`[DEBUG] Competitor \${index + 1}: \${place.name}\`);
+    console.log("        Matching Treatments:", matchingTerms);
+    console.log("        Searched Text Snippet:", allText.substring(0, 100), "...");
 
     const div = document.createElement("div");
     div.style.marginBottom = "10px";
-    div.innerHTML = `
-      <span style="display:inline-block; width:12px; height:12px; background-color:${color}; border-radius:50%; margin-right:8px;"></span>
-      <strong>${place.name}</strong><br>
-      ${place.vicinity}<br>
-      Rating: ${place.rating || 'N/A'}<br>
-      Competitive Ranking: ${ranking}<br>
-      <em>Matching Treatments: ${matchingTerms.length ? matchingTerms.join(', ') : 'None'}</em>
-    `;
+    div.innerHTML = \`
+      <span style="display:inline-block; width:12px; height:12px; background-color:\${color}; border-radius:50%; margin-right:8px;"></span>
+      <strong>\${place.name}</strong><br>
+      \${place.vicinity}<br>
+      Rating: \${place.rating || 'N/A'}<br>
+      Competitive Ranking: \${ranking}<br>
+      <em>Matching Treatments: \${matchingTerms.length ? matchingTerms.join(', ') : 'None'}</em>
+    \`;
     resultsDiv.appendChild(div);
   });
 }
 
-// Add console logging to the submit handler
 document.getElementById("dentistForm").addEventListener("submit", function (e) {
   e.preventDefault();
   const formPracticeName = document.getElementById("practiceName");
@@ -222,103 +219,3 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
     }
   });
 });
-
-
-document.getElementById("sortOptions").addEventListener("change", renderResults);
-
-document.getElementById("downloadPDF").addEventListener("click", function () {
-  const { jsPDF } = window.jspdf;
-  const today = new Date();
-  const dateString = today.toLocaleDateString();
-  const doc = new jsPDF();
-  let yOffset = 10;
-
-  doc.setFontSize(14);
-  doc.text("Dental Pain Eraser - Competitor Analysis Report", 10, yOffset);
-  yOffset += 10;
-
-  doc.setFont(undefined, 'bold');
-  doc.text("Date:", 10, yOffset);
-  doc.setFont(undefined, 'normal');
-  doc.text(` ${dateString}`, 30, yOffset);
-  yOffset += 8;
-
-  doc.setFont(undefined, 'bold');
-  doc.text("Practice Name:", 10, yOffset);
-  doc.setFont(undefined, 'normal');
-  doc.text(` ${practiceNameInput}`, 50, yOffset);
-  yOffset += 8;
-
-  doc.setFont(undefined, 'bold');
-  doc.text("Practice Address:", 10, yOffset);
-  doc.setFont(undefined, 'normal');
-  yOffset += 8;
-  doc.text(` ${practiceAddressInput}`, 10, yOffset);
-  yOffset += 8;
-
-  doc.setFont(undefined, 'bold');
-  doc.text("Treatments Offered:", 10, yOffset);
-  doc.setFont(undefined, 'normal');
-  yOffset += 8;
-
-  const allTreatments = selectedTreatments.length ? selectedTreatments.join(', ') : 'N/A';
-  doc.text(allTreatments, 10, yOffset);
-  yOffset += 10;
-
-  if (staticMapUrl) {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = staticMapUrl;
-    img.onload = () => {
-      try {
-        doc.addImage(img, 'PNG', 10, yOffset, 190, 100);
-        addCompetitorsToPDF(doc, yOffset + 110);
-      } catch (error) {
-        console.error("Error adding map image to PDF:", error);
-        doc.text("Static map could not be loaded.", 10, yOffset);
-        addCompetitorsToPDF(doc, yOffset + 10);
-      }
-    };
-    img.onerror = () => {
-      doc.text("Static map could not be loaded.", 10, yOffset);
-      addCompetitorsToPDF(doc, yOffset + 10);
-    };
-  } else {
-    doc.text("Static map URL not set.", 10, yOffset);
-    addCompetitorsToPDF(doc, yOffset + 10);
-  }
-});
-
-function addCompetitorsToPDF(doc, yOffset) {
-  doc.setFontSize(12);
-
-  competitors.forEach((place, index) => {
-    const ranking = getRankingByRating(place.rating);
-    const matchingTerms = selectedTreatments.filter(term => place.name?.toLowerCase().includes(term));
-
-    doc.setFont(undefined, 'bold');
-    doc.text(`${index + 1}. ${place.name}`, 10, yOffset);
-    doc.setFont(undefined, 'normal');
-    yOffset += 6;
-    doc.text(`Address: ${place.vicinity}`, 10, yOffset);
-    yOffset += 6;
-    doc.text(`Rating: ${place.rating || 'N/A'}`, 10, yOffset);
-    yOffset += 6;
-    doc.text(`Competitive Ranking: ${ranking}`, 10, yOffset);
-    yOffset += 6;
-    doc.text(`Matching Treatments: ${matchingTerms.length ? matchingTerms.join(', ') : 'None'}`, 10, yOffset);
-    yOffset += 10;
-
-    if (yOffset > 270) {
-      doc.addPage();
-      yOffset = 20;
-    }
-  });
-
-  doc.save('Competitor_Analysis_Report.pdf');
-}
-
-window.onerror = function(message, source, lineno, colno, error) {
-  showError("Oops! Something went wrong. Please reload the page and try again.");
-  console.error("Global Error:", message, "at", source + ":" + lineno + ":" + colno);
-};
