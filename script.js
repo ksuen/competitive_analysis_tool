@@ -219,3 +219,115 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
     }
   });
 });
+
+
+document.getElementById("downloadPDF").addEventListener("click", function () {
+  const { jsPDF } = window.jspdf;
+  const today = new Date();
+  const dateString = today.toLocaleDateString();
+  const doc = new jsPDF();
+  let yOffset = 10;
+
+  doc.setFontSize(14);
+  doc.text("Dental Pain Eraser - Competitor Analysis Report", 10, yOffset);
+  yOffset += 10;
+
+  doc.setFont(undefined, 'bold');
+  doc.text("Date:", 10, yOffset);
+  doc.setFont(undefined, 'normal');
+  doc.text(" " + dateString, 30, yOffset);
+  yOffset += 8;
+
+  doc.setFont(undefined, 'bold');
+  doc.text("Practice Name:", 10, yOffset);
+  doc.setFont(undefined, 'normal');
+  doc.text(" " + practiceNameInput, 50, yOffset);
+  yOffset += 8;
+
+  doc.setFont(undefined, 'bold');
+  doc.text("Practice Address:", 10, yOffset);
+  doc.setFont(undefined, 'normal');
+  yOffset += 8;
+  doc.text(" " + practiceAddressInput, 10, yOffset);
+  yOffset += 8;
+
+  doc.setFont(undefined, 'bold');
+  doc.text("Treatments Offered:", 10, yOffset);
+  doc.setFont(undefined, 'normal');
+  yOffset += 8;
+
+  const allTreatments = selectedTreatments.length ? selectedTreatments.join(', ') : 'N/A';
+  doc.text(allTreatments, 10, yOffset);
+  yOffset += 10;
+
+  if (staticMapUrl) {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = staticMapUrl;
+    img.onload = () => {
+      try {
+        doc.addImage(img, 'PNG', 10, yOffset, 190, 100);
+        addCompetitorsToPDF(doc, yOffset + 110);
+      } catch (error) {
+        console.error("Error adding map image to PDF:", error);
+        doc.text("Static map could not be loaded.", 10, yOffset);
+        addCompetitorsToPDF(doc, yOffset + 10);
+      }
+    };
+    img.onerror = () => {
+      doc.text("Static map could not be loaded.", 10, yOffset);
+      addCompetitorsToPDF(doc, yOffset + 10);
+    };
+  } else {
+    doc.text("Static map URL not set.", 10, yOffset);
+    addCompetitorsToPDF(doc, yOffset + 10);
+  }
+});
+
+function addCompetitorsToPDF(doc, yOffset) {
+  doc.setFontSize(12);
+
+  const sortOption = document.getElementById("sortOptions").value;
+  let sorted = [...competitors];
+
+  if (sortOption === "rating-desc") {
+    sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  } else if (sortOption === "rating-asc") {
+    sorted.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+  } else if (sortOption === "name-asc") {
+    sorted.sort((a, b) => normalizeString(a.name).localeCompare(normalizeString(b.name)));
+  } else if (sortOption === "name-desc") {
+    sorted.sort((a, b) => normalizeString(b.name).localeCompare(normalizeString(a.name)));
+  }
+
+  sorted.forEach((place, index) => {
+    const ranking = getRankingByRating(place.rating);
+    const allText = `
+      ${place.name || ''} 
+      ${place.website || ''} 
+      ${place.editorial_summary?.overview || ''} 
+      ${place.reviews?.map(r => r.text).join(' ') || ''}
+    `.toLowerCase();
+    const matchingTerms = selectedTreatments.filter(term => allText.includes(term));
+
+    doc.setFont(undefined, 'bold');
+    doc.text(`${index + 1}. ${place.name}`, 10, yOffset);
+    doc.setFont(undefined, 'normal');
+    yOffset += 6;
+    doc.text(`Address: ${place.vicinity}`, 10, yOffset);
+    yOffset += 6;
+    doc.text(`Rating: ${place.rating || 'N/A'}`, 10, yOffset);
+    yOffset += 6;
+    doc.text(`Competitive Ranking: ${ranking}`, 10, yOffset);
+    yOffset += 6;
+    doc.text(`Matching Treatments: ${matchingTerms.length ? matchingTerms.join(', ') : 'None'}`, 10, yOffset);
+    yOffset += 10;
+
+    if (yOffset > 270) {
+      doc.addPage();
+      yOffset = 20;
+    }
+  });
+
+  doc.save('Competitor_Analysis_Report.pdf');
+}
