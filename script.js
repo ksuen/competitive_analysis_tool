@@ -237,7 +237,7 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.text(allTreatments, 62, yOffset);
   yOffset += 10;
 // Ratings legend (2x2 layout)
-  doc.text("Ratings Legend:", 10, yOffset);
+  doc.text("Ratings:", 10, yOffset);
   yOffset += 6;
 
   const legendItems = [
@@ -260,10 +260,13 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
     doc.setFillColor(...item.color);
     doc.circle(x, y - 1.5, 2, 'F');
     doc.setTextColor(0);
+    doc.setFontSize(12);
     doc.text(item.label, x + 6, y);
   });
 
   yOffset += rowSpacing * 2 + 4;
+
+  doc.setFontSize(14);
 
   if (staticMapUrl) {
     const img = new Image();
