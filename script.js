@@ -212,23 +212,21 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.setFont(undefined, 'bold');
   doc.text("Practice Name:", 10, yOffset);
   doc.setFont(undefined, 'normal');
-  doc.text(` ${practiceNameInput}`, 30, yOffset);
+  doc.text(` ${practiceNameInput}`, 50, yOffset);
   yOffset += 8;
 
   doc.setFont(undefined, 'bold');
   doc.text("Practice Address:", 10, yOffset);
   doc.setFont(undefined, 'normal');
-  yOffset += 8;
-  doc.text(` ${practiceAddressInput}`, 10, yOffset);
+  doc.text(` ${practiceAddressInput}`, 50, yOffset);
   yOffset += 8;
 
   doc.setFont(undefined, 'bold');
   doc.text("Treatments Offered:", 10, yOffset);
   doc.setFont(undefined, 'normal');
-  yOffset += 8;
 
   const allTreatments = selectedTreatments.length ? selectedTreatments.join(', ') : 'N/A';
-  doc.text(allTreatments, 10, yOffset);
+  doc.text(allTreatments, 50, yOffset);
   yOffset += 10;
 
   if (staticMapUrl) {
