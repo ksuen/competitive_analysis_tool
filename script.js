@@ -212,13 +212,13 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.setFont(undefined, 'bold');
   doc.text("Practice Name:", 10, yOffset);
   doc.setFont(undefined, 'normal');
-  doc.text(` ${practiceNameInput}`, 50, yOffset);
+  doc.text(` ${practiceNameInput}`, 65, yOffset);
   yOffset += 8;
 
   doc.setFont(undefined, 'bold');
   doc.text("Practice Address:", 10, yOffset);
   doc.setFont(undefined, 'normal');
-  doc.text(` ${practiceAddressInput}`, 50, yOffset);
+  doc.text(` ${practiceAddressInput}`, 65, yOffset);
   yOffset += 8;
 
   doc.setFont(undefined, 'bold');
@@ -226,7 +226,7 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.setFont(undefined, 'normal');
 
   const allTreatments = selectedTreatments.length ? selectedTreatments.join(', ') : 'N/A';
-  doc.text(allTreatments, 50, yOffset);
+  doc.text(allTreatments, 65, yOffset);
   yOffset += 10;
 
   if (staticMapUrl) {
