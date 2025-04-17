@@ -228,7 +228,7 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.setFont(undefined, 'bold');
   doc.text("Treatments Offered:", 10, yOffset);
   doc.setFont(undefined, 'normal');
-  const allTreatments = selectedTreatments.length ? capitalizeWords(selectedTreatments).join(', ') : 'N/A';
+  const allTreatments = selectedTreatments.length ? capitalizeWord(selectedTreatments).join(', ') : 'N/A';
 
   doc.text(allTreatments, 62, yOffset);
   yOffset += 10;
