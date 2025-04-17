@@ -206,7 +206,7 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.setFont(undefined, 'bold');
   doc.text("Date:", 10, yOffset);
   doc.setFont(undefined, 'normal');
-  doc.text(` ${dateString}`, 30, yOffset);
+  doc.text(` ${dateString}`, 25, yOffset);
   yOffset += 8;
 
   doc.setFont(undefined, 'bold');
@@ -226,7 +226,7 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.setFont(undefined, 'normal');
 
   const allTreatments = selectedTreatments.length ? selectedTreatments.join(', ') : 'N/A';
-  doc.text(allTreatments, 65, yOffset);
+  doc.text(allTreatments, 62, yOffset);
   yOffset += 10;
 
   if (staticMapUrl) {
