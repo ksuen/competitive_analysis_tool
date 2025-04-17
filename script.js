@@ -236,6 +236,34 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
 
   doc.text(allTreatments, 62, yOffset);
   yOffset += 10;
+// Ratings legend
+  const legendYStart = yOffset;
+  doc.setFontSize(10);
+  doc.setFont(undefined, 'bold');
+  doc.text("Ratings Legend:", 10, yOffset);
+  yOffset += 6;
+  doc.setFont(undefined, 'normal');
+  doc.setTextColor(0, 128, 0); // Green
+  doc.text("●", 10, yOffset);
+  doc.setTextColor(0);
+  doc.text(" Excellent (4.5 – 5.0)", 16, yOffset);
+
+  doc.setTextColor(0, 0, 255); // Blue
+  doc.text("●", 60, yOffset);
+  doc.setTextColor(0);
+  doc.text(" Good (4.0 – 4.4)", 66, yOffset);
+
+  doc.setTextColor(255, 165, 0); // Orange
+  doc.text("●", 110, yOffset);
+  doc.setTextColor(0);
+  doc.text(" Fair (3.0 – 3.9)", 116, yOffset);
+
+  doc.setTextColor(255, 0, 0); // Red
+  doc.text("●", 160, yOffset);
+  doc.setTextColor(0);
+  doc.text(" Poor (< 3.0 or N/A)", 166, yOffset);
+
+  yOffset += 10;
 
   if (staticMapUrl) {
     const img = new Image();
@@ -286,7 +314,14 @@ function addCompetitorsToPDF(doc, yOffset) {
 
     const matchingTerms = selectedTreatments.filter(term => allText.includes(term.toLowerCase()));
 
-    doc.setFont(undefined, 'bold');
+    // Determine dot color
+    if (place.rating >= 4.5) doc.setTextColor(0, 128, 0);      // Green
+    else if (place.rating >= 4.0) doc.setTextColor(0, 0, 255); // Blue
+    else if (place.rating >= 3.0) doc.setTextColor(255, 165, 0); // Orange
+    else doc.setTextColor(255, 0, 0);                          // Red
+    doc.text("●", 10, yOffset);
+    doc.setTextColor(0); // Reset to black
+doc.setFont(undefined, 'bold');
     doc.text(`${index + 1}. ${place.name}`, 10, yOffset);
     doc.setFont(undefined, 'normal');
     yOffset += 6;
