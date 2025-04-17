@@ -237,7 +237,6 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.text(allTreatments, 62, yOffset);
   yOffset += 10;
 // Ratings legend (2x2 layout)
-  doc.setFont(undefined, 'bold');
   doc.text("Ratings Legend:", 10, yOffset);
   yOffset += 6;
 
@@ -248,7 +247,7 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
     { color: [255, 0, 0], label: "Poor (< 3.0 or N/A)" }
   ];
 
-  const startX = 10;
+  const startX = 12;
   const colSpacing = 100;
   const rowSpacing = 6;
 
@@ -315,13 +314,22 @@ function addCompetitorsToPDF(doc, yOffset) {
 
     const matchingTerms = selectedTreatments.filter(term => allText.includes(term.toLowerCase()));
 
+    const label = `${index + 1}.`;
+    doc.setFont(undefined, 'bold');
+    doc.text(label, 10, yOffset);
+
+    const labelWidth = doc.getTextWidth(label);
+    const dotX = 10 + labelWidth + 2;
+
     if (place.rating >= 4.5) doc.setFillColor(0, 128, 0);      // Green
     else if (place.rating >= 4.0) doc.setFillColor(0, 0, 255); // Blue
     else if (place.rating >= 3.0) doc.setFillColor(255, 165, 0); // Orange
     else doc.setFillColor(255, 0, 0);                          // Red
-    doc.circle(8, yOffset - 1.5, 2, 'F');
-doc.setFont(undefined, 'bold');
-    doc.text(`${index + 1}. ${place.name}`, 10, yOffset);
+
+    doc.circle(dotX, yOffset - 1.5, 2, 'F');
+    doc.setTextColor(0);
+    doc.setFont(undefined, 'bold');
+    doc.text(`${place.name}`, dotX + 6, yOffset);
     doc.setFont(undefined, 'normal');
     yOffset += 6;
     doc.text(`Address: ${place.vicinity}`, 10, yOffset);
