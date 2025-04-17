@@ -131,7 +131,7 @@ function renderResults() {
       ${place.vicinity}<br>
       Rating: ${place.rating || 'N/A'}<br>
       Competitive Ranking: ${ranking}<br>
-      <em>Matching Treatments: ${matchingTerms.length ? matchingTerms.join(', ') : 'None'}</em>
+      <em>Matching Treatments: ${matchingTerms.length ? matchingTerms.map(term => term.charAt(0).toUpperCase() + term.slice(1)).join(', ') : 'None'}</em>
     `;
     resultsDiv.appendChild(div);
   });
@@ -290,7 +290,7 @@ function addCompetitorsToPDF(doc, yOffset) {
     yOffset += 6;
     doc.text(`Competitive Ranking: ${ranking}`, 10, yOffset);
     yOffset += 6;
-    doc.text(`Matching Treatments: ${matchingTerms.length ? matchingTerms.join(', ') : 'None'}`, 10, yOffset);
+    doc.text(`Matching Treatments: ${matchingTerms.length ? matchingTerms.map(term => term.charAt(0).toUpperCase() + term.slice(1)).join(', ') : 'None'}`, 10, yOffset);
     yOffset += 10;
 
     if (yOffset > 270) {
