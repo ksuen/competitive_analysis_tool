@@ -236,28 +236,35 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
 
   doc.text(allTreatments, 62, yOffset);
   yOffset += 10;
-// Ratings legend
+// Ratings legend (2x2 layout)
   doc.setFont(undefined, 'bold');
   doc.text("Ratings Legend:", 10, yOffset);
   yOffset += 6;
 
-  const legends = [
+  const legendItems = [
     { color: [0, 128, 0], label: "Excellent (4.5 – 5.0)" },
     { color: [0, 0, 255], label: "Good (4.0 – 4.4)" },
     { color: [255, 165, 0], label: "Fair (3.0 – 3.9)" },
     { color: [255, 0, 0], label: "Poor (< 3.0 or N/A)" }
   ];
 
-  let x = 10;
-  legends.forEach(({ color, label }) => {
-    doc.setFillColor(...color);
-    doc.circle(x, yOffset - 1.5, 2, 'F');
+  const startX = 10;
+  const colSpacing = 100;
+  const rowSpacing = 6;
+
+  legendItems.forEach((item, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const x = startX + col * colSpacing;
+    const y = yOffset + row * rowSpacing;
+
+    doc.setFillColor(...item.color);
+    doc.circle(x, y - 1.5, 2, 'F');
     doc.setTextColor(0);
-    doc.text(label, x + 6, yOffset);
-    x += 65;
+    doc.text(item.label, x + 6, y);
   });
 
-  yOffset += 10;
+  yOffset += rowSpacing * 2 + 4;
 
   if (staticMapUrl) {
     const img = new Image();
