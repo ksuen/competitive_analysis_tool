@@ -148,14 +148,14 @@ function renderResults() {
 document.getElementById("dentistForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
-  practiceNameInput = document.getElementById("practiceName").value;
+  practiceNameInput = document.getElementById("practiceName").value.trim();
   
   if (!practiceNameInput || !practiceAddressInput) {
     showError("Practice name and address are required.");
     return;
   }
 
-  practiceAddressInput = document.getElementById("practiceAddress").value;
+  practiceAddressInput = document.getElementById("practiceAddress").value.trim();
   const formTreatments = document.getElementById("treatments");
 
   typedTreatments = [...new Set(formTreatments.value.split(",").map(t => t.trim().toLowerCase()).filter(Boolean))];
