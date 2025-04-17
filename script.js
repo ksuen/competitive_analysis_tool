@@ -237,31 +237,25 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.text(allTreatments, 62, yOffset);
   yOffset += 10;
 // Ratings legend
-  const legendYStart = yOffset;
-  doc.setFontSize(10);
   doc.setFont(undefined, 'bold');
   doc.text("Ratings Legend:", 10, yOffset);
   yOffset += 6;
-  doc.setFont(undefined, 'normal');
-  doc.setTextColor(0, 128, 0); // Green
-  doc.text("●", 10, yOffset);
-  doc.setTextColor(0);
-  doc.text(" Excellent (4.5 – 5.0)", 16, yOffset);
 
-  doc.setTextColor(0, 0, 255); // Blue
-  doc.text("●", 60, yOffset);
-  doc.setTextColor(0);
-  doc.text(" Good (4.0 – 4.4)", 66, yOffset);
+  const legends = [
+    { color: [0, 128, 0], label: "Excellent (4.5 – 5.0)" },
+    { color: [0, 0, 255], label: "Good (4.0 – 4.4)" },
+    { color: [255, 165, 0], label: "Fair (3.0 – 3.9)" },
+    { color: [255, 0, 0], label: "Poor (< 3.0 or N/A)" }
+  ];
 
-  doc.setTextColor(255, 165, 0); // Orange
-  doc.text("●", 110, yOffset);
-  doc.setTextColor(0);
-  doc.text(" Fair (3.0 – 3.9)", 116, yOffset);
-
-  doc.setTextColor(255, 0, 0); // Red
-  doc.text("●", 160, yOffset);
-  doc.setTextColor(0);
-  doc.text(" Poor (< 3.0 or N/A)", 166, yOffset);
+  let x = 10;
+  legends.forEach(({ color, label }) => {
+    doc.setFillColor(...color);
+    doc.circle(x, yOffset - 1.5, 2, 'F');
+    doc.setTextColor(0);
+    doc.text(label, x + 6, yOffset);
+    x += 65;
+  });
 
   yOffset += 10;
 
@@ -314,13 +308,11 @@ function addCompetitorsToPDF(doc, yOffset) {
 
     const matchingTerms = selectedTreatments.filter(term => allText.includes(term.toLowerCase()));
 
-    // Determine dot color
-    if (place.rating >= 4.5) doc.setTextColor(0, 128, 0);      // Green
-    else if (place.rating >= 4.0) doc.setTextColor(0, 0, 255); // Blue
-    else if (place.rating >= 3.0) doc.setTextColor(255, 165, 0); // Orange
-    else doc.setTextColor(255, 0, 0);                          // Red
-    doc.text("●", 10, yOffset);
-    doc.setTextColor(0); // Reset to black
+    if (place.rating >= 4.5) doc.setFillColor(0, 128, 0);      // Green
+    else if (place.rating >= 4.0) doc.setFillColor(0, 0, 255); // Blue
+    else if (place.rating >= 3.0) doc.setFillColor(255, 165, 0); // Orange
+    else doc.setFillColor(255, 0, 0);                          // Red
+    doc.circle(8, yOffset - 1.5, 2, 'F');
 doc.setFont(undefined, 'bold');
     doc.text(`${index + 1}. ${place.name}`, 10, yOffset);
     doc.setFont(undefined, 'normal');
