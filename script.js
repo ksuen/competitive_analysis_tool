@@ -44,6 +44,10 @@ function getRankingByRating(rating) {
   return 'Poor';
 }
 
+function capitalizeWord(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
 function createCustomPin(color) {
   const pin = document.createElement('div');
   pin.style.backgroundColor = color;
@@ -224,8 +228,8 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.setFont(undefined, 'bold');
   doc.text("Treatments Offered:", 10, yOffset);
   doc.setFont(undefined, 'normal');
+  const allTreatments = selectedTreatments.length ? capitalizeWords(selectedTreatments).join(', ') : 'N/A';
 
-  const allTreatments = selectedTreatments.length ? selectedTreatments.join(', ') : 'N/A';
   doc.text(allTreatments, 62, yOffset);
   yOffset += 10;
 
