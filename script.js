@@ -212,7 +212,7 @@ document.getElementById("downloadPDF").addEventListener("click", function () {
   doc.setFont(undefined, 'bold');
   doc.text("Practice Name:", 10, yOffset);
   doc.setFont(undefined, 'normal');
-  doc.text(` ${practiceNameInput}`, 50, yOffset);
+  doc.text(` ${practiceNameInput}`, 30, yOffset);
   yOffset += 8;
 
   doc.setFont(undefined, 'bold');
