@@ -319,7 +319,7 @@ function addCompetitorsToPDF(doc, yOffset) {
     doc.text(label, 10, yOffset);
 
     const labelWidth = doc.getTextWidth(label);
-    const dotX = 10 + labelWidth + 2;
+    const dotX = 12 + labelWidth + 2;
 
     if (place.rating >= 4.5) doc.setFillColor(0, 128, 0);      // Green
     else if (place.rating >= 4.0) doc.setFillColor(0, 0, 255); // Blue
@@ -329,7 +329,7 @@ function addCompetitorsToPDF(doc, yOffset) {
     doc.circle(dotX, yOffset - 1.5, 2, 'F');
     doc.setTextColor(0);
     doc.setFont(undefined, 'bold');
-    doc.text(`${place.name}`, dotX + 3, yOffset);
+    doc.text(`${place.name}`, dotX + 4, yOffset);
     doc.setFont(undefined, 'normal');
     yOffset += 6;
     doc.text(`Address: ${place.vicinity}`, 10, yOffset);
