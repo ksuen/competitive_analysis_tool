@@ -202,7 +202,7 @@ document.getElementById("resultsList").appendChild(spinner);
             competitors.forEach(createMarker);
             buildStaticMapUrl();
             renderResults();
-const spinner = document.getElementById('loadingSpinner'); if (spinner) spinner.remove();
+const existingSpinner = document.getElementById('loadingSpinner'); if (existingSpinner) existingSpinner.remove();
           });
         } else {
           document.getElementById("resultsList").innerHTML = "<h3 style='color:red;'>No competitors found.</h3>";
