@@ -149,10 +149,16 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
   practiceNameInput = document.getElementById("practiceName").value;
+  
+  if (!practiceNameInput || !practiceAddressInput) {
+    showError("Practice name and address are required.");
+    return;
+  }
+
   practiceAddressInput = document.getElementById("practiceAddress").value;
   const formTreatments = document.getElementById("treatments");
 
-  typedTreatments = formTreatments.value.split(",").map(t => t.trim().toLowerCase()).filter(Boolean);
+  typedTreatments = [...new Set(formTreatments.value.split(",").map(t => t.trim().toLowerCase()).filter(Boolean))];
   checkedTreatments = Array.from(document.querySelectorAll('#keywordSuggestions input[type="checkbox"]:checked')).map(cb => cb.value.toLowerCase());
   selectedTreatments = [...typedTreatments, ...checkedTreatments];
 
@@ -184,9 +190,19 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
           fetchPlaceDetailsBatch(results.slice(0, 15), (detailedResults) => {
             competitors = detailedResults;
             document.getElementById("resultsList").innerHTML = "";
+
+const spinner = document.createElement('div');
+spinner.id = "loadingSpinner";
+spinner.textContent = "Loading competitors...";
+spinner.style.fontWeight = "bold";
+spinner.style.marginTop = "10px";
+spinner.style.color = "#333";
+document.getElementById("resultsList").appendChild(spinner);
+
             competitors.forEach(createMarker);
             buildStaticMapUrl();
             renderResults();
+const spinner = document.getElementById('loadingSpinner'); if (spinner) spinner.remove();
           });
         } else {
           document.getElementById("resultsList").innerHTML = "<h3 style='color:red;'>No competitors found.</h3>";
