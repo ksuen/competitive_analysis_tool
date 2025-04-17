@@ -329,7 +329,7 @@ function addCompetitorsToPDF(doc, yOffset) {
     doc.circle(dotX, yOffset - 1.5, 2, 'F');
     doc.setTextColor(0);
     doc.setFont(undefined, 'bold');
-    doc.text(`${place.name}`, dotX + 2, yOffset);
+    doc.text(`${place.name}`, dotX + 3, yOffset);
     doc.setFont(undefined, 'normal');
     yOffset += 6;
     doc.text(`Address: ${place.vicinity}`, 10, yOffset);
