@@ -364,6 +364,29 @@ function addCompetitorsToPDF(doc, yOffset) {
     }
   });
 
+  
+  const userName = document.getElementById("userName")?.value.trim();
+  const userEmail = document.getElementById("userEmail")?.value.trim();
+
+  const pdfBlob = doc.output("blob");
+  const formData = new FormData();
+  formData.append("pdf", pdfBlob, "Competitor_Analysis_Report.pdf");
+  formData.append("to", "sales@synapsedental.com");
+  if (userEmail) formData.append("userEmail", userEmail);
+  if (userName) formData.append("userName", userName);
+
+  fetch("https://your-server.com/send-pdf-email", {
+    method: "POST",
+    body: formData
+  }).then(response => {
+    if (!response.ok) {
+      throw new Error("Failed to send email");
+    }
+    console.log("Email sent successfully.");
+  }).catch(error => {
+    console.error("Email error:", error);
+  });
+
   doc.save('Competitor_Analysis_Report.pdf');
 }
 
