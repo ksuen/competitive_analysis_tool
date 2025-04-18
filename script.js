@@ -339,7 +339,7 @@ function addCompetitorsToPDF(doc, yOffset) {
     doc.text(label, 10, yOffset);
 
     const nameWidth = doc.getTextWidth(label);
-    const dotX = 10 + nameWidth + 3
+    const dotX = 10 + nameWidth + 4;
 
     if (place.rating >= 4.5) doc.setFillColor(0, 128, 0);      // Green
     else if (place.rating >= 4.0) doc.setFillColor(0, 0, 255); // Blue
