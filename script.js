@@ -333,12 +333,13 @@ function addCompetitorsToPDF(doc, yOffset) {
 
     const matchingTerms = selectedTreatments.filter(term => allText.includes(term.toLowerCase()));
 
-    const label = `${index + 1}.`;
+    const label = `${index + 1}. ${place.name}`;
     doc.setFont(undefined, 'bold');
+    doc.setTextColor(0);
     doc.text(label, 10, yOffset);
 
-    const labelWidth = doc.getTextWidth(label);
-    const dotX = 11 + labelWidth + 2;
+    const nameWidth = doc.getTextWidth(label);
+    const dotX = 10 + nameWidth + 2;
 
     if (place.rating >= 4.5) doc.setFillColor(0, 128, 0);      // Green
     else if (place.rating >= 4.0) doc.setFillColor(0, 0, 255); // Blue
@@ -346,9 +347,6 @@ function addCompetitorsToPDF(doc, yOffset) {
     else doc.setFillColor(255, 0, 0);                          // Red
 
     doc.circle(dotX, yOffset - 1.5, 2, 'F');
-    doc.setTextColor(0);
-    doc.setFont(undefined, 'bold');
-    doc.text(`${place.name}`, dotX + 3, yOffset);
     doc.setFont(undefined, 'normal');
     yOffset += 6;
     doc.text(`Address: ${place.vicinity}`, 10, yOffset);
