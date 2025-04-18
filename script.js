@@ -346,7 +346,7 @@ function addCompetitorsToPDF(doc, yOffset) {
     else if (place.rating >= 3.0) doc.setFillColor(255, 165, 0); // Orange
     else doc.setFillColor(255, 0, 0);                          // Red
 
-    doc.circle(dotX, yOffset - 1.5, 2, 'F');
+    doc.circle(dotX, yOffset - 1.5, 4, 'F');
     doc.setFont(undefined, 'normal');
     yOffset += 6;
     doc.text(`Address: ${place.vicinity}`, 10, yOffset);
