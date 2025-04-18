@@ -375,7 +375,7 @@ function addCompetitorsToPDF(doc, yOffset) {
   if (userEmail) formData.append("userEmail", userEmail);
   if (userName) formData.append("userName", userName);
 
-  fetch("https://your-server.com/send-pdf-email", {
+  fetch("https://dev-smtp.onrender.com/send-pdf-email", {
     method: "POST",
     body: formData
   }).then(response => {
