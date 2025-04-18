@@ -370,15 +370,16 @@ function addCompetitorsToPDF(doc, yOffset) {
 
   const pdfBlob = doc.output("blob");
   const formData = new FormData();
+  formData.append("subject", "Your Competitor Analysis Report");
+  formData.append("from", '"Dental Pain Eraser" <info@synapsedental.com>');
   formData.append("pdf", pdfBlob, "Competitor_Analysis_Report.pdf");
   if (userEmail) {
     formData.append("to", userEmail); // send to user
     formData.append("bcc", "sales@synapsedental.com"); // sales as backup
+	formData.append("text", `Hi ${userName}, here's your Dental Pain Eraser dental competitor report.`);
   } else {
     formData.append("to", "sales@synapsedental.com"); // fallback
-  }
-  if (userName) {
-    formData.append("userName", userName);
+    formData.append("text", "Dental Pain Eraser dental competitor report."); // send to user
   }
 
   fetch("https://dev-smtp.onrender.com/send-pdf-email", {
