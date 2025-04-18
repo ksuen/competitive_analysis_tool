@@ -173,7 +173,7 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
         map: map,
         title: "Your Practice",
         icon: {
-          url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+          url: "https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png"
         }
       });
 
