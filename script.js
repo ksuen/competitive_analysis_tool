@@ -1,5 +1,4 @@
-
-// Cleaned and Refactored script.js for Dental Pain Eraser
+// script.js for Dental Pain Eraser
 let map;
 let service;
 let competitors = [];
@@ -376,7 +375,7 @@ function addCompetitorsToPDF(doc, yOffset) {
   if (userEmail) {
     formData.append("to", userEmail); // send to user
     formData.append("bcc", "sales@synapsedental.com"); // sales as backup
-	formData.append("text", `Hi ${userName}, here's your Dental Pain Eraser dental competitor report.`);
+    formData.append("text", `Hi ${userName}, here's your Dental Pain Eraser dental competitor report.`);
   } else {
     formData.append("to", "sales@synapsedental.com"); // fallback
     formData.append("text", "Dental Pain Eraser dental competitor report."); // send to user
