@@ -371,9 +371,15 @@ function addCompetitorsToPDF(doc, yOffset) {
   const pdfBlob = doc.output("blob");
   const formData = new FormData();
   formData.append("pdf", pdfBlob, "Competitor_Analysis_Report.pdf");
-  formData.append("bcc", "sales@synapsedental.com");
-  if (userEmail) formData.append("userEmail", userEmail);
-  if (userName) formData.append("userName", userName);
+  if (userEmail) {
+    formData.append("to", userEmail); // send to user
+    formData.append("bcc", "sales@synapsedental.com"); // sales as backup
+  } else {
+    formData.append("to", "sales@synapsedental.com"); // fallback
+  }
+  if (userName) {
+    formData.append("userName", userName);
+  }
 
   fetch("https://dev-smtp.onrender.com/send-pdf-email", {
     method: "POST",
