@@ -191,18 +191,18 @@ document.getElementById("dentistForm").addEventListener("submit", function (e) {
             competitors = detailedResults;
             document.getElementById("resultsList").innerHTML = "";
 
-const spinner = document.createElement('div');
-spinner.id = "loadingSpinner";
-spinner.textContent = "Loading competitors...";
-spinner.style.fontWeight = "bold";
-spinner.style.marginTop = "10px";
-spinner.style.color = "#333";
-document.getElementById("resultsList").appendChild(spinner);
+            const spinner = document.createElement('div');
+            spinner.id = "loadingSpinner";
+            spinner.textContent = "Loading competitors...";
+            spinner.style.fontWeight = "bold";
+            spinner.style.marginTop = "10px";
+            spinner.style.color = "#333";
+            document.getElementById("resultsList").appendChild(spinner);
 
             competitors.forEach(createMarker);
             buildStaticMapUrl();
             renderResults();
-const existingSpinner = document.getElementById('loadingSpinner'); if (existingSpinner) existingSpinner.remove();
+            const existingSpinner = document.getElementById('loadingSpinner'); if (existingSpinner) existingSpinner.remove();
           });
         } else {
           document.getElementById("resultsList").innerHTML = "<h3 style='color:red;'>No competitors found.</h3>";
